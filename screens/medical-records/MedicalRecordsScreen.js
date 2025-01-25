@@ -1,9 +1,12 @@
 import React from 'react';
-import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Text, Card, Button, Icon, Divider } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useMedicalRecord } from '../../context/MedicalRecordContext';
 
 const MedicalRecordsScreen = ({ navigation }) => {
+  const { appointments, documents, prescriptions, loading } = useMedicalRecord();
+
   const quickActions = [
     {
       id: 1,
@@ -34,30 +37,38 @@ const MedicalRecordsScreen = ({ navigation }) => {
       title: 'Historial de Citas',
       icon: 'calendar-clock',
       route: 'AppointmentHistory',
-      count: 12,
+      count: appointments.length,
     },
     {
       id: 2,
       title: 'Documentos Médicos',
       icon: 'file-document-multiple',
       route: 'MedicalDocuments',
-      count: 8,
+      count: documents.length,
     },
     {
       id: 3,
       title: 'Resultados de Laboratorio',
       icon: 'test-tube',
       route: 'LabResults',
-      count: 5,
+      count: documents.filter(doc => doc.type === 'LAB_RESULT').length,
     },
     {
       id: 4,
       title: 'Historial de Prescripciones',
       icon: 'prescription',
       route: 'PrescriptionHistory',
-      count: 15,
+      count: prescriptions.length,
     },
   ];
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0077B6" />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -150,6 +161,12 @@ const MedicalRecordsScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#f5f5f5',
   },
   summaryCard: {

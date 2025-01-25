@@ -1,37 +1,11 @@
 import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
+import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, SearchBar, Button, Card, Icon, Badge } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { CATEGORIES } from '../../constants/pharmacy/products';
 
 const PharmacyScreen = ({ navigation }) => {
   const [search, setSearch] = useState('');
-
-  const categories = [
-    {
-      id: 1,
-      name: 'Medicamentos',
-      icon: 'pill',
-      count: 1500,
-    },
-    {
-      id: 2,
-      name: 'Dermocosméticos',
-      icon: 'lotion',
-      count: 300,
-    },
-    {
-      id: 3,
-      name: 'Cuidado Personal',
-      icon: 'hand-heart',
-      count: 450,
-    },
-    {
-      id: 4,
-      name: 'Vitaminas',
-      icon: 'vitamin',
-      count: 200,
-    },
-  ];
 
   const quickActions = [
     {
@@ -57,6 +31,15 @@ const PharmacyScreen = ({ navigation }) => {
     },
   ];
 
+  const handleSearch = () => {
+    if (search.trim()) {
+      navigation.navigate('CategoryProducts', {
+        category: { name: 'Todos' },
+        searchQuery: search,
+      });
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -71,6 +54,7 @@ const PharmacyScreen = ({ navigation }) => {
             inputContainerStyle={styles.searchInputContainer}
             lightTheme
             round
+            onSubmitEditing={handleSearch}
           />
         </View>
 
@@ -103,23 +87,29 @@ const PharmacyScreen = ({ navigation }) => {
         <View style={styles.categoriesSection}>
           <Text style={styles.sectionTitle}>Categorías</Text>
           <View style={styles.categoriesGrid}>
-            {categories.map((category) => (
-              <Card key={category.id} containerStyle={styles.categoryCard}>
-                <View style={styles.categoryContent}>
-                  <Icon
-                    name={category.icon}
-                    type="material-community"
-                    size={30}
-                    color="#0077B6"
-                  />
-                  <Text style={styles.categoryName}>{category.name}</Text>
-                  <Badge
-                    value={category.count}
-                    status="primary"
-                    containerStyle={styles.badge}
-                  />
-                </View>
-              </Card>
+            {CATEGORIES.map((category) => (
+              <TouchableOpacity 
+                key={category.id}
+                onPress={() => navigation.navigate('CategoryProducts', { category })}
+                style={styles.categoryWrapper}
+              >
+                <Card containerStyle={styles.categoryCard}>
+                  <View style={styles.categoryContent}>
+                    <Icon
+                      name={category.icon}
+                      type="material-community"
+                      size={30}
+                      color="#0077B6"
+                    />
+                    <Text style={styles.categoryName}>{category.name}</Text>
+                    <Badge
+                      value={category.count}
+                      status="primary"
+                      containerStyle={styles.badge}
+                    />
+                  </View>
+                </Card>
+              </TouchableOpacity>
             ))}
           </View>
         </View>
@@ -191,11 +181,15 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
-  categoryCard: {
+  categoryWrapper: {
     width: '48%',
+    marginBottom: 10,
+  },
+  categoryCard: {
+    width: '100%',
     borderRadius: 10,
     padding: 10,
-    marginBottom: 10,
+    margin: 0,
   },
   categoryContent: {
     alignItems: 'center',

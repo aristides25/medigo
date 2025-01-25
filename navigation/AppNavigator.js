@@ -10,7 +10,15 @@ import ReviewsScreen from '../screens/appointments/ReviewsScreen';
 import PostAppointmentReviewScreen from '../screens/appointments/PostAppointmentReviewScreen';
 import AppointmentDetailScreen from '../screens/appointments/AppointmentDetailScreen';
 import PharmacyScreen from '../screens/pharmacy/PharmacyScreen';
+import CategoryProductsScreen from '../screens/pharmacy/CategoryProductsScreen';
+import ProductDetailScreen from '../screens/pharmacy/ProductDetailScreen';
+import CartScreen from '../screens/pharmacy/CartScreen';
+import MyPrescriptionsScreen from '../screens/pharmacy/MyPrescriptionsScreen';
+import UploadPrescriptionScreen from '../screens/pharmacy/UploadPrescriptionScreen';
 import MedicalRecordsScreen from '../screens/medical-records/MedicalRecordsScreen';
+import MedicalDocumentsScreen from '../screens/medical-records/MedicalDocumentsScreen';
+import DocumentDetailScreen from '../screens/medical-records/DocumentDetailScreen';
+import UploadDocumentScreen from '../screens/medical-records/UploadDocumentScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -98,10 +106,66 @@ const AppNavigator = () => {
         }}
       />
       <Stack.Screen 
+        name="CategoryProducts" 
+        component={CategoryProductsScreen}
+        options={({ route }) => ({
+          title: route.params.category.name,
+        })}
+      />
+      <Stack.Screen 
+        name="ProductDetail" 
+        component={ProductDetailScreen}
+        options={({ route }) => ({
+          title: 'Detalle del Producto',
+        })}
+      />
+      <Stack.Screen 
+        name="Cart" 
+        component={CartScreen}
+        options={{
+          title: 'Carrito de Compras',
+        }}
+      />
+      <Stack.Screen 
+        name="MyPrescriptions" 
+        component={MyPrescriptionsScreen}
+        options={{
+          title: 'Mis Recetas',
+        }}
+      />
+      <Stack.Screen 
+        name="UploadPrescription" 
+        component={UploadPrescriptionScreen}
+        options={{
+          title: 'Subir Receta',
+        }}
+      />
+      <Stack.Screen 
         name="MedicalRecords" 
         component={MedicalRecordsScreen}
         options={{
           title: 'Expediente Médico',
+        }}
+      />
+      <Stack.Screen 
+        name="MedicalDocuments" 
+        component={MedicalDocumentsScreen}
+        options={{
+          title: 'Documentos Médicos',
+        }}
+      />
+      <Stack.Screen 
+        name="DocumentDetail" 
+        component={DocumentDetailScreen}
+        options={{
+          title: 'Detalle del Documento',
+        }}
+      />
+      <Stack.Screen 
+        name="UploadDocument" 
+        component={UploadDocumentScreen}
+        options={{
+          title: 'Subir Documento',
         }}
       />
     </Stack.Navigator>
