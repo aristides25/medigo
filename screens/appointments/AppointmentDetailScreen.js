@@ -2,9 +2,11 @@ import React from 'react';
 import { View, ScrollView, StyleSheet, Alert } from 'react-native';
 import { Text, Card, Button, Icon, Divider } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAppointment } from '../../context/AppointmentContext';
 
 const AppointmentDetailScreen = ({ route, navigation }) => {
   const { appointment } = route.params;
+  const { cancelAppointment } = useAppointment();
 
   const handleCancelAppointment = () => {
     Alert.alert(
@@ -19,8 +21,17 @@ const AppointmentDetailScreen = ({ route, navigation }) => {
           text: 'Sí, Cancelar',
           style: 'destructive',
           onPress: () => {
-            // Aquí iría la lógica para cancelar la cita
-            navigation.goBack();
+            cancelAppointment(appointment.id);
+            Alert.alert(
+              'Cita Cancelada',
+              'La cita ha sido cancelada exitosamente',
+              [
+                {
+                  text: 'OK',
+                  onPress: () => navigation.goBack(),
+                },
+              ]
+            );
           },
         },
       ]
@@ -78,7 +89,7 @@ const AppointmentDetailScreen = ({ route, navigation }) => {
             <View style={styles.detailRow}>
               <Icon name="calendar" type="font-awesome" size={16} color="#666" />
               <Text style={styles.detailText}>
-                {appointment.date.toLocaleDateString('es-ES', {
+                {new Date(appointment.date).toLocaleDateString('es-ES', {
                   weekday: 'long',
                   year: 'numeric',
                   month: 'long',
@@ -90,7 +101,7 @@ const AppointmentDetailScreen = ({ route, navigation }) => {
             <View style={styles.detailRow}>
               <Icon name="clock-o" type="font-awesome" size={16} color="#666" />
               <Text style={styles.detailText}>
-                {appointment.date.toLocaleTimeString('es-ES', {
+                {new Date(appointment.date).toLocaleTimeString('es-ES', {
                   hour: '2-digit',
                   minute: '2-digit',
                 })}
@@ -101,6 +112,20 @@ const AppointmentDetailScreen = ({ route, navigation }) => {
               <Icon name="stethoscope" type="font-awesome" size={16} color="#666" />
               <Text style={styles.detailText}>{appointment.type}</Text>
             </View>
+
+            {appointment.reason && (
+              <View style={styles.detailRow}>
+                <Icon name="file-text-o" type="font-awesome" size={16} color="#666" />
+                <Text style={styles.detailText}>{appointment.reason}</Text>
+              </View>
+            )}
+
+            {appointment.notes && (
+              <View style={styles.detailRow}>
+                <Icon name="sticky-note-o" type="font-awesome" size={16} color="#666" />
+                <Text style={styles.detailText}>{appointment.notes}</Text>
+              </View>
+            )}
           </View>
 
           <Divider style={styles.divider} />

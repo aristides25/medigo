@@ -1,35 +1,8 @@
 import React, { useState } from 'react';
 import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import { Text, Button, Card, Icon, Badge, FAB } from '@rneui/themed';
+import { Text, Button, Card, Icon, Badge, FAB, ButtonGroup } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-// Datos de ejemplo
-const MOCK_APPOINTMENTS = [
-  {
-    id: 1,
-    provider: {
-      id: 1,
-      name: 'Dr. Juan Pérez',
-      specialty: 'Medicina General',
-      type: 'Doctor',
-    },
-    date: new Date('2024-01-25T10:30:00'),
-    type: 'Consulta General',
-    status: 'confirmada',
-  },
-  {
-    id: 2,
-    provider: {
-      id: 2,
-      name: 'Dra. María González',
-      specialty: 'Cardiología',
-      type: 'Doctor',
-    },
-    date: new Date('2024-01-26T15:00:00'),
-    type: 'Especialista',
-    status: 'pendiente',
-  },
-];
+import { useAppointment } from '../../context/AppointmentContext';
 
 const AppointmentCard = ({ appointment, onPress }) => {
   const getStatusColor = (status) => {
@@ -76,7 +49,7 @@ const AppointmentCard = ({ appointment, onPress }) => {
         <View style={styles.detailRow}>
           <Icon name="calendar" type="font-awesome" size={16} color="#666" />
           <Text style={styles.detailText}>
-            {appointment.date.toLocaleDateString('es-ES', {
+            {new Date(appointment.date).toLocaleDateString('es-ES', {
               weekday: 'long',
               year: 'numeric',
               month: 'long',
@@ -88,7 +61,7 @@ const AppointmentCard = ({ appointment, onPress }) => {
         <View style={styles.detailRow}>
           <Icon name="clock-o" type="font-awesome" size={16} color="#666" />
           <Text style={styles.detailText}>
-            {appointment.date.toLocaleTimeString('es-ES', {
+            {new Date(appointment.date).toLocaleTimeString('es-ES', {
               hour: '2-digit',
               minute: '2-digit',
             })}
@@ -111,8 +84,9 @@ const AppointmentCard = ({ appointment, onPress }) => {
 };
 
 const AppointmentsScreen = ({ navigation }) => {
-  const [appointments] = useState(MOCK_APPOINTMENTS);
-  const [filterStatus, setFilterStatus] = useState('todas');
+  const { appointments } = useAppointment();
+  const [filterStatus, setFilterStatus] = useState(0);
+  const filterButtons = ['Todas', 'Pendientes', 'Confirmadas', 'Canceladas'];
 
   const handleAppointmentPress = (appointment) => {
     navigation.navigate('AppointmentDetail', { appointment });
@@ -122,34 +96,63 @@ const AppointmentsScreen = ({ navigation }) => {
     navigation.navigate('SearchProviders');
   };
 
-  const filteredAppointments = appointments.filter(appointment => {
-    if (filterStatus === 'todas') return true;
-    return appointment.status === filterStatus;
-  });
+  const getFilteredAppointments = () => {
+    if (filterStatus === 0) return appointments;
+    
+    const statusMap = {
+      1: 'pendiente',
+      2: 'confirmada',
+      3: 'cancelada'
+    };
+    
+    return appointments.filter(appointment => 
+      appointment.status === statusMap[filterStatus]
+    );
+  };
+
+  const filteredAppointments = getFilteredAppointments();
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Mis Citas Médicas</Text>
-        <TouchableOpacity 
-          style={styles.filterButton}
-          onPress={() => {
-            // Aquí iría la lógica del filtro
-          }}
-        >
-          <Icon name="filter" type="font-awesome" size={20} color="#0077B6" />
-          <Text style={styles.filterText}>Filtrar</Text>
-        </TouchableOpacity>
       </View>
 
+      <ButtonGroup
+        buttons={filterButtons}
+        selectedIndex={filterStatus}
+        onPress={setFilterStatus}
+        containerStyle={styles.buttonGroupContainer}
+        selectedButtonStyle={styles.selectedButton}
+        textStyle={styles.buttonGroupText}
+        selectedTextStyle={styles.selectedButtonText}
+      />
+
       <ScrollView style={styles.content}>
-        {filteredAppointments.map((appointment) => (
-          <AppointmentCard
-            key={appointment.id}
-            appointment={appointment}
-            onPress={handleAppointmentPress}
-          />
-        ))}
+        {filteredAppointments.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Icon
+              name="calendar-plus-o"
+              type="font-awesome"
+              size={50}
+              color="#666"
+            />
+            <Text style={styles.emptyStateText}>No tienes citas {filterStatus !== 0 ? 'en este estado' : ''}</Text>
+            <Button
+              title="Agendar Nueva Cita"
+              onPress={handleNewAppointment}
+              buttonStyle={styles.newAppointmentButton}
+            />
+          </View>
+        ) : (
+          filteredAppointments.map((appointment) => (
+            <AppointmentCard
+              key={appointment.id}
+              appointment={appointment}
+              onPress={handleAppointmentPress}
+            />
+          ))
+        )}
       </ScrollView>
 
       <FAB
@@ -168,11 +171,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
+    padding: 15,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
@@ -182,29 +181,36 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#444',
   },
-  filterButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 8,
+  buttonGroupContainer: {
+    marginHorizontal: 15,
+    marginVertical: 10,
+    height: 40,
+    borderRadius: 20,
+    borderColor: '#0077B6',
   },
-  filterText: {
-    marginLeft: 5,
+  selectedButton: {
+    backgroundColor: '#0077B6',
+  },
+  buttonGroupText: {
     color: '#0077B6',
+    fontSize: 14,
+  },
+  selectedButtonText: {
+    color: '#fff',
     fontWeight: 'bold',
   },
   content: {
     flex: 1,
+    padding: 15,
   },
   card: {
     borderRadius: 10,
-    marginHorizontal: 15,
-    marginVertical: 8,
-    padding: 15,
+    marginBottom: 10,
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    marginBottom: 15,
   },
   doctorName: {
     fontSize: 18,
@@ -217,10 +223,10 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   badge: {
-    marginTop: 2,
+    marginTop: 0,
   },
   appointmentDetails: {
-    marginTop: 15,
+    marginBottom: 15,
   },
   detailRow: {
     flexDirection: 'row',
@@ -229,13 +235,29 @@ const styles = StyleSheet.create({
   },
   detailText: {
     marginLeft: 10,
-    color: '#666',
     fontSize: 14,
+    color: '#666',
   },
   detailsButton: {
-    marginTop: 15,
     backgroundColor: '#0077B6',
     borderRadius: 8,
+  },
+  emptyState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 50,
+  },
+  emptyStateText: {
+    fontSize: 16,
+    color: '#666',
+    marginVertical: 15,
+    textAlign: 'center',
+  },
+  newAppointmentButton: {
+    backgroundColor: '#0077B6',
+    paddingHorizontal: 30,
+    borderRadius: 25,
   },
 });
 

@@ -6,21 +6,24 @@ import AppNavigator from './navigation/AppNavigator';
 import { CartProvider } from './context/CartContext';
 import { PharmacyProvider } from './context/PharmacyContext';
 import { MedicalRecordProvider } from './context/MedicalRecordContext';
+import { AppointmentProvider } from './context/AppointmentContext';
 
 export default function App() {
   return (
     <SafeAreaProvider>
-      <MedicalRecordProvider>
-        <PharmacyProvider>
-          <CartProvider>
-            <ThemeProvider>
-              <NavigationContainer>
-                <AppNavigator />
-              </NavigationContainer>
-            </ThemeProvider>
-          </CartProvider>
-        </PharmacyProvider>
-      </MedicalRecordProvider>
+      <AppointmentProvider>
+        <MedicalRecordProvider>
+          <PharmacyProvider>
+            <CartProvider>
+              <ThemeProvider>
+                <NavigationContainer>
+                  <AppNavigator />
+                </NavigationContainer>
+              </ThemeProvider>
+            </CartProvider>
+          </PharmacyProvider>
+        </MedicalRecordProvider>
+      </AppointmentProvider>
     </SafeAreaProvider>
   );
 }

@@ -18,21 +18,8 @@ const MOCK_SERVICES = [
 ];
 
 const ProviderDetailScreen = ({ route, navigation }) => {
+  const { provider } = route.params;
   const [selectedDate, setSelectedDate] = useState(null);
-  
-  // En un caso real, estos datos vendrían de route.params y/o una API
-  const provider = {
-    id: 1,
-    name: 'Dr. Juan Pérez',
-    type: 'Doctor',
-    specialty: 'Medicina General',
-    rating: 4.8,
-    reviewCount: 124,
-    address: 'Calle Principal #123, Ciudad',
-    description: 'Médico general con más de 15 años de experiencia. Especializado en medicina preventiva y atención primaria.',
-    education: 'Universidad Nacional Autónoma',
-    languages: ['Español', 'Inglés'],
-  };
 
   const handleStartBooking = () => {
     navigation.navigate('BookAppointment', { provider });
@@ -145,7 +132,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   bookingButton: {
-    backgroundColor: '#2089dc',
+    backgroundColor: '#0077B6',
     borderRadius: 10,
     paddingVertical: 12,
   },

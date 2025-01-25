@@ -1,16 +1,32 @@
 import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
+import { View, ScrollView, StyleSheet, Alert } from 'react-native';
 import { Text, Button, Card, Input } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useAppointment } from '../../context/AppointmentContext';
 
 const BookAppointmentScreen = ({ route, navigation }) => {
-  const { provider } = route.params;
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const { provider, isRescheduling, originalAppointment } = route.params;
+  const { createAppointment, updateAppointment } = useAppointment();
+  
+  // Si es reprogramación, usar los datos de la cita original
+  const [selectedDate, setSelectedDate] = useState(
+    isRescheduling ? new Date(originalAppointment.date) : new Date()
+  );
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [selectedTime, setSelectedTime] = useState('');
-  const [reason, setReason] = useState('');
-  const [notes, setNotes] = useState('');
+  const [selectedTime, setSelectedTime] = useState(
+    isRescheduling ? new Date(originalAppointment.date).toLocaleTimeString('es-ES', {
+      hour: '2-digit',
+      minute: '2-digit',
+    }).replace(':', '') : ''
+  );
+  const [reason, setReason] = useState(
+    isRescheduling ? originalAppointment.reason : ''
+  );
+  const [notes, setNotes] = useState(
+    isRescheduling ? originalAppointment.notes : ''
+  );
+  const [loading, setLoading] = useState(false);
 
   const handleDateChange = (event, date) => {
     setShowDatePicker(false);
@@ -19,28 +35,97 @@ const BookAppointmentScreen = ({ route, navigation }) => {
     }
   };
 
-  const handleConfirmBooking = () => {
-    navigation.navigate('Payment', {
-      provider,
-      appointmentData: {
-        date: selectedDate,
-        time: selectedTime,
+  const handleConfirmBooking = async () => {
+    if (!selectedTime || !reason) {
+      Alert.alert('Error', 'Por favor completa todos los campos requeridos');
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // Combinar fecha y hora
+      const [hours, minutes] = selectedTime.split(':');
+      const appointmentDate = new Date(selectedDate);
+      appointmentDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+      const appointmentData = {
+        provider: {
+          id: provider.id,
+          name: provider.name,
+          specialty: provider.specialty,
+          type: provider.type,
+        },
+        date: appointmentDate,
+        type: 'Consulta General',
         reason,
         notes,
-      },
-    });
+      };
+
+      if (isRescheduling) {
+        // Actualizar la cita existente
+        updateAppointment(originalAppointment.id, {
+          ...appointmentData,
+          status: 'pendiente', // Resetear el estado al reprogramar
+        });
+        Alert.alert(
+          'Cita Reprogramada',
+          'Tu cita ha sido reprogramada exitosamente',
+          [
+            {
+              text: 'Ver Detalles',
+              onPress: () => navigation.navigate('AppointmentDetail', { 
+                appointment: {
+                  ...originalAppointment,
+                  ...appointmentData,
+                  status: 'pendiente',
+                }
+              }),
+            },
+            {
+              text: 'Volver a Citas',
+              onPress: () => navigation.navigate('Appointments'),
+            },
+          ]
+        );
+      } else {
+        // Crear nueva cita
+        const newAppointment = createAppointment(appointmentData);
+        Alert.alert(
+          'Cita Agendada',
+          'Tu cita ha sido agendada exitosamente',
+          [
+            {
+              text: 'Ver Detalles',
+              onPress: () => navigation.navigate('AppointmentDetail', { appointment: newAppointment }),
+            },
+            {
+              text: 'Volver a Citas',
+              onPress: () => navigation.navigate('Appointments'),
+            },
+          ]
+        );
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Hubo un error al procesar la cita. Por favor intenta de nuevo.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const availableTimes = [
-    '9:00 AM', '10:00 AM', '11:00 AM',
-    '2:00 PM', '3:00 PM', '4:00 PM'
+    '09:00', '10:00', '11:00',
+    '14:00', '15:00', '16:00'
   ];
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <Card>
-          <Card.Title>Reservar Cita con {provider.name}</Card.Title>
+          <Card.Title>
+            {isRescheduling ? 'Reprogramar Cita con ' : 'Reservar Cita con '}
+            {provider.name}
+          </Card.Title>
           <Card.Divider />
           
           {/* Selección de Fecha */}
@@ -80,12 +165,13 @@ const BookAppointmentScreen = ({ route, navigation }) => {
 
           {/* Motivo de la Consulta */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Motivo de la Consulta</Text>
+            <Text style={styles.sectionTitle}>Motivo de la Consulta *</Text>
             <Input
               value={reason}
               onChangeText={setReason}
               placeholder="Ej: Consulta de rutina"
               multiline
+              required
             />
           </View>
 
@@ -102,9 +188,10 @@ const BookAppointmentScreen = ({ route, navigation }) => {
 
           {/* Botón de Confirmación */}
           <Button
-            title="Continuar al Pago"
+            title={isRescheduling ? "Confirmar Reprogramación" : "Confirmar Cita"}
             onPress={handleConfirmBooking}
-            disabled={!selectedTime || !reason}
+            disabled={!selectedTime || !reason || loading}
+            loading={loading}
             buttonStyle={styles.confirmButton}
           />
         </Card>
@@ -137,7 +224,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   confirmButton: {
-    backgroundColor: '#2089dc',
+    backgroundColor: '#0077B6',
     borderRadius: 10,
     paddingVertical: 12,
     marginTop: 10,

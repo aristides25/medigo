@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { SearchBar, Button, Text, ButtonGroup, LinearProgress, Card, Rating } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -28,6 +28,18 @@ const MOCK_PROVIDERS = [
     distance: 3.8,
     availability: 'Mañana 9:00 AM',
     description: 'Centro médico especializado en cardiología y medicina interna.',
+  },
+  {
+    id: '3',
+    name: 'Hospital Central',
+    type: 'Hospital',
+    specialty: 'Múltiples Especialidades',
+    rating: 4.3,
+    reviewCount: 156,
+    address: 'Av. Las Mercedes, Caracas',
+    distance: 5.2,
+    availability: 'Hoy 2:00 PM',
+    description: 'Hospital general con servicios completos y atención de emergencias 24/7.',
   },
 ];
 
@@ -65,12 +77,25 @@ const ProviderCard = ({ provider, onPress }) => {
 
 const SearchProvidersScreen = ({ navigation }) => {
   const [search, setSearch] = useState('');
-  const [providers] = useState(MOCK_PROVIDERS);
+  const [allProviders] = useState(MOCK_PROVIDERS);
+  const [filteredProviders, setFilteredProviders] = useState(MOCK_PROVIDERS);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const handleProviderSelect = (provider) => {
-    navigation.navigate('ProviderDetail', { provider });
+    navigation.navigate('ProviderDetail', {
+      provider: {
+        ...provider,
+        id: provider.id,
+        name: provider.name,
+        type: provider.type,
+        specialty: provider.specialty,
+        rating: provider.rating,
+        reviewCount: provider.reviewCount,
+        address: provider.address,
+        description: provider.description,
+      }
+    });
   };
 
   const updateSearch = (text) => {
@@ -79,6 +104,43 @@ const SearchProvidersScreen = ({ navigation }) => {
     // Simular búsqueda
     setTimeout(() => setLoading(false), 500);
   };
+
+  // Función para filtrar proveedores
+  const filterProviders = () => {
+    let filtered = [...allProviders];
+    
+    // Filtrar por texto de búsqueda
+    if (search) {
+      filtered = filtered.filter(provider => 
+        provider.name.toLowerCase().includes(search.toLowerCase()) ||
+        provider.specialty.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+    
+    // Filtrar por tipo seleccionado
+    if (selectedIndex !== 0) { // Si no es "Todos"
+      const selectedType = filterButtons[selectedIndex];
+      filtered = filtered.filter(provider => {
+        switch(selectedType) {
+          case 'Médicos':
+            return provider.type === 'Doctor';
+          case 'Clínicas':
+            return provider.type === 'Clínica';
+          case 'Hospitales':
+            return provider.type === 'Hospital';
+          default:
+            return true;
+        }
+      });
+    }
+    
+    setFilteredProviders(filtered);
+  };
+
+  // Efecto para aplicar filtros cuando cambian los criterios
+  useEffect(() => {
+    filterProviders();
+  }, [search, selectedIndex]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -113,9 +175,9 @@ const SearchProvidersScreen = ({ navigation }) => {
 
       <ScrollView style={styles.content}>
         <Text style={styles.resultsText}>
-          {providers.length} proveedores encontrados
+          {filteredProviders.length} proveedores encontrados
         </Text>
-        {providers.map((provider) => (
+        {filteredProviders.map((provider) => (
           <ProviderCard
             key={provider.id}
             provider={provider}
