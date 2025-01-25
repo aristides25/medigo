@@ -9,6 +9,8 @@ import PaymentScreen from '../screens/appointments/PaymentScreen';
 import ReviewsScreen from '../screens/appointments/ReviewsScreen';
 import PostAppointmentReviewScreen from '../screens/appointments/PostAppointmentReviewScreen';
 import AppointmentDetailScreen from '../screens/appointments/AppointmentDetailScreen';
+import PharmacyScreen from '../screens/pharmacy/PharmacyScreen';
+import MedicalRecordsScreen from '../screens/medical-records/MedicalRecordsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -86,6 +88,20 @@ const AppNavigator = () => {
         component={AppointmentDetailScreen}
         options={{
           title: 'Detalles de la Cita',
+        }}
+      />
+      <Stack.Screen 
+        name="Pharmacy" 
+        component={PharmacyScreen}
+        options={{
+          title: 'Farmacia',
+        }}
+      />
+      <Stack.Screen 
+        name="MedicalRecords" 
+        component={MedicalRecordsScreen}
+        options={{
+          title: 'Expediente Médico',
         }}
       />
     </Stack.Navigator>
