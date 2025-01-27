@@ -1,22 +1,50 @@
 import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
+import { View, ScrollView, StyleSheet, Alert } from 'react-native';
 import { Text, Card, Rating, Button, Input, CheckBox } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRating } from '../../context/RatingContext';
 
 const PostAppointmentReviewScreen = ({ route, navigation }) => {
   const { appointment } = route.params;
+  const { createRating, loading } = useRating();
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
-  const [punctuality, setPunctuality] = useState(true);
-  const [cleanliness, setCleanliness] = useState(true);
-  const [communication, setCommunication] = useState(true);
+  const [aspects, setAspects] = useState({
+    punctuality: true,
+    cleanliness: true,
+    communication: true,
+    professionalism: true
+  });
 
-  const handleSubmit = () => {
-    // Aquí se manejaría la lógica para guardar la reseña
-    // Por ahora solo navegamos de vuelta
-    navigation.navigate('Appointments', {
-      message: '¡Gracias por tu reseña!'
-    });
+  const handleSubmit = async () => {
+    try {
+      const reviewData = {
+        appointmentId: appointment.id,
+        providerId: appointment.provider.id,
+        rating,
+        aspects,
+        comment,
+      };
+
+      await createRating(reviewData);
+      
+      Alert.alert(
+        '¡Gracias por tu calificación!',
+        'Tu opinión nos ayuda a mejorar el servicio.',
+        [
+          {
+            text: 'OK',
+            onPress: () => navigation.navigate('Appointments')
+          }
+        ]
+      );
+    } catch (error) {
+      Alert.alert(
+        'Error',
+        'No se pudo enviar tu calificación. Por favor, intenta de nuevo.',
+        [{ text: 'OK' }]
+      );
+    }
   };
 
   return (
@@ -40,35 +68,42 @@ const PostAppointmentReviewScreen = ({ route, navigation }) => {
               onFinishRating={setRating}
               style={styles.rating}
               startingValue={rating}
+              imageSize={30}
             />
           </View>
 
           <View style={styles.aspectsSection}>
-            <Text style={styles.sectionTitle}>Aspectos del Servicio</Text>
+            <Text style={styles.sectionTitle}>Aspectos Destacados</Text>
             <CheckBox
               title="Puntualidad"
-              checked={punctuality}
-              onPress={() => setPunctuality(!punctuality)}
+              checked={aspects.punctuality}
+              onPress={() => setAspects({...aspects, punctuality: !aspects.punctuality})}
               containerStyle={styles.checkbox}
             />
             <CheckBox
               title="Limpieza e Higiene"
-              checked={cleanliness}
-              onPress={() => setCleanliness(!cleanliness)}
+              checked={aspects.cleanliness}
+              onPress={() => setAspects({...aspects, cleanliness: !aspects.cleanliness})}
               containerStyle={styles.checkbox}
             />
             <CheckBox
               title="Comunicación Clara"
-              checked={communication}
-              onPress={() => setCommunication(!communication)}
+              checked={aspects.communication}
+              onPress={() => setAspects({...aspects, communication: !aspects.communication})}
+              containerStyle={styles.checkbox}
+            />
+            <CheckBox
+              title="Profesionalismo"
+              checked={aspects.professionalism}
+              onPress={() => setAspects({...aspects, professionalism: !aspects.professionalism})}
               containerStyle={styles.checkbox}
             />
           </View>
 
           <View style={styles.commentSection}>
-            <Text style={styles.sectionTitle}>Tu Opinión</Text>
+            <Text style={styles.sectionTitle}>Comentarios (Opcional)</Text>
             <Input
-              placeholder="Comparte los detalles de tu experiencia..."
+              placeholder="Comparte tu experiencia..."
               value={comment}
               onChangeText={setComment}
               multiline
@@ -78,10 +113,11 @@ const PostAppointmentReviewScreen = ({ route, navigation }) => {
           </View>
 
           <Button
-            title="Enviar Reseña"
+            title="Enviar Calificación"
             onPress={handleSubmit}
             buttonStyle={styles.submitButton}
-            disabled={!comment.trim()}
+            loading={loading}
+            disabled={loading}
           />
         </Card>
       </ScrollView>
@@ -127,6 +163,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     marginLeft: 0,
     marginRight: 0,
+    padding: 8,
   },
   commentSection: {
     marginBottom: 20,

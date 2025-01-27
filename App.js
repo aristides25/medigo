@@ -7,23 +7,26 @@ import { CartProvider } from './context/CartContext';
 import { PharmacyProvider } from './context/PharmacyContext';
 import { MedicalRecordProvider } from './context/MedicalRecordContext';
 import { AppointmentProvider } from './context/AppointmentContext';
+import { RatingProvider } from './context/RatingContext';
 
 export default function App() {
   return (
     <SafeAreaProvider>
-      <AppointmentProvider>
-        <MedicalRecordProvider>
-          <PharmacyProvider>
-            <CartProvider>
-              <ThemeProvider>
-                <NavigationContainer>
-                  <AppNavigator />
-                </NavigationContainer>
-              </ThemeProvider>
-            </CartProvider>
-          </PharmacyProvider>
-        </MedicalRecordProvider>
-      </AppointmentProvider>
+      <MedicalRecordProvider>
+        <PharmacyProvider>
+          <AppointmentProvider>
+            <RatingProvider>
+              <CartProvider>
+                <ThemeProvider>
+                  <NavigationContainer>
+                    <AppNavigator />
+                  </NavigationContainer>
+                </ThemeProvider>
+              </CartProvider>
+            </RatingProvider>
+          </AppointmentProvider>
+        </PharmacyProvider>
+      </MedicalRecordProvider>
     </SafeAreaProvider>
   );
 }

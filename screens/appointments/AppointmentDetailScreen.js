@@ -89,22 +89,22 @@ const AppointmentDetailScreen = ({ route, navigation }) => {
             <View style={styles.detailRow}>
               <Icon name="calendar" type="font-awesome" size={16} color="#666" />
               <Text style={styles.detailText}>
-                {new Date(appointment.date).toLocaleDateString('es-ES', {
+                {appointment.date ? new Date(appointment.date).toLocaleDateString('es-ES', {
                   weekday: 'long',
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric',
-                })}
+                }) : 'Fecha no disponible'}
               </Text>
             </View>
 
             <View style={styles.detailRow}>
               <Icon name="clock-o" type="font-awesome" size={16} color="#666" />
               <Text style={styles.detailText}>
-                {new Date(appointment.date).toLocaleTimeString('es-ES', {
+                {appointment.date ? new Date(appointment.date).toLocaleTimeString('es-ES', {
                   hour: '2-digit',
                   minute: '2-digit',
-                })}
+                }) : 'Hora no disponible'}
               </Text>
             </View>
 
@@ -160,16 +160,18 @@ const AppointmentDetailScreen = ({ route, navigation }) => {
               </>
             )}
 
-            {appointment.status === 'confirmada' && (
+            {appointment.status === 'completada' && !appointment.hasReview && (
               <Button
-                title="Calificar Servicio"
+                title="Calificar Cita"
+                onPress={() => navigation.navigate('PostAppointmentReview', { appointment })}
+                buttonStyle={[styles.actionButton, { backgroundColor: '#4CAF50' }]}
+                containerStyle={styles.buttonContainer}
                 icon={{
                   name: 'star',
-                  type: 'font-awesome',
+                  type: 'material-community',
                   color: 'white',
+                  size: 20,
                 }}
-                buttonStyle={[styles.actionButton, styles.reviewButton]}
-                onPress={handleReview}
               />
             )}
           </View>
@@ -237,6 +239,10 @@ const styles = StyleSheet.create({
   },
   reviewButton: {
     backgroundColor: '#FFC107',
+  },
+  buttonContainer: {
+    marginTop: 10,
+    marginBottom: 10,
   },
 });
 

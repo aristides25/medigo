@@ -38,7 +38,8 @@ const ProviderDetailScreen = ({ route, navigation }) => {
               <Rating
                 readonly
                 startingValue={provider.rating}
-                imageSize={20}
+                imageSize={16}
+                style={styles.rating}
               />
               <TouchableOpacity 
                 onPress={() => navigation.navigate('Reviews', { provider })}
@@ -114,10 +115,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 5,
+    flexWrap: 'wrap',
+  },
+  rating: {
+    padding: 0,
   },
   reviewCount: {
     marginLeft: 8,
     color: '#666',
+    fontSize: 12,
   },
   address: {
     color: '#666',

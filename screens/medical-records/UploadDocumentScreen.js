@@ -3,7 +3,10 @@ import { View, ScrollView, StyleSheet, Alert, Platform } from 'react-native';
 import { Text, Card, Button, Icon, Input, Divider } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as DocumentPicker from 'expo-document-picker';
+import * as FileSystem from 'expo-file-system';
 import { useMedicalRecord } from '../../context/MedicalRecordContext';
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 const DocumentTypeSelector = ({ selectedType, onSelect }) => {
   const types = [
@@ -16,26 +19,27 @@ const DocumentTypeSelector = ({ selectedType, onSelect }) => {
   return (
     <View style={styles.typeContainer}>
       {types.map((type) => (
-        <Button
-          key={type.value}
-          title={type.label}
-          icon={{
-            name: type.icon,
-            type: 'material-community',
-            color: selectedType === type.value ? 'white' : '#0077B6',
-            size: 20,
-          }}
-          buttonStyle={[
-            styles.typeButton,
-            selectedType === type.value && styles.selectedTypeButton,
-          ]}
-          titleStyle={[
-            styles.typeButtonText,
-            selectedType === type.value && styles.selectedTypeButtonText,
-          ]}
-          onPress={() => onSelect(type.value)}
-          type={selectedType === type.value ? 'solid' : 'outline'}
-        />
+        <View key={type.value} style={styles.typeButtonWrapper}>
+          <Button
+            title={type.label}
+            icon={{
+              name: type.icon,
+              type: 'material-community',
+              color: selectedType === type.value ? 'white' : '#0077B6',
+              size: 28,
+            }}
+            buttonStyle={[
+              styles.typeButton,
+              selectedType === type.value && styles.selectedTypeButton,
+            ]}
+            titleStyle={[
+              styles.typeButtonText,
+              selectedType === type.value && styles.selectedTypeButtonText,
+            ]}
+            onPress={() => onSelect(type.value)}
+            type={selectedType === type.value ? 'solid' : 'outline'}
+          />
+        </View>
       ))}
     </View>
   );
@@ -47,6 +51,22 @@ const UploadDocumentScreen = ({ navigation }) => {
   const [type, setType] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  const validateFile = async (file) => {
+    // Verificar tamaño
+    if (file.size > MAX_FILE_SIZE) {
+      throw new Error('El archivo es demasiado grande. Máximo 10MB.');
+    }
+
+    // Verificar tipo
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+    if (!allowedTypes.includes(file.mimeType)) {
+      throw new Error('Tipo de archivo no permitido. Solo PDF e imágenes.');
+    }
+
+    return true;
+  };
 
   const handleFilePick = async () => {
     try {
@@ -56,10 +76,31 @@ const UploadDocumentScreen = ({ navigation }) => {
       });
 
       if (result.type === 'success') {
-        setSelectedFile(result);
+        try {
+          await validateFile(result);
+          setSelectedFile(result);
+        } catch (error) {
+          Alert.alert('Error', error.message);
+        }
       }
     } catch (error) {
       Alert.alert('Error', 'No se pudo seleccionar el archivo');
+    }
+  };
+
+  const uploadFile = async (fileUri) => {
+    try {
+      // Simular progreso de carga
+      for (let i = 0; i <= 100; i += 10) {
+        setUploadProgress(i);
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+      // Por ahora solo retornamos el URI original
+      // La lógica real de subida se implementará cuando tengamos el backend
+      return fileUri;
+    } catch (error) {
+      throw new Error('Error al subir el archivo');
     }
   };
 
@@ -81,16 +122,18 @@ const UploadDocumentScreen = ({ navigation }) => {
 
     try {
       setLoading(true);
+      const fileUri = await uploadFile(selectedFile.uri);
 
-      // Crear el nuevo documento
       const newDocument = {
+        id: Date.now().toString(),
         title: title.trim(),
         type,
         date: new Date(),
         file: {
-          uri: selectedFile.uri,
+          uri: fileUri,
           type: selectedFile.mimeType,
           name: selectedFile.name,
+          size: selectedFile.size,
         },
         sharedWith: [],
       };
@@ -110,13 +153,13 @@ const UploadDocumentScreen = ({ navigation }) => {
       Alert.alert('Error', 'No se pudo subir el documento');
     } finally {
       setLoading(false);
+      setUploadProgress(0);
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        {/* Formulario */}
         <Card containerStyle={styles.formCard}>
           <Input
             placeholder="Título del documento"
@@ -139,7 +182,6 @@ const UploadDocumentScreen = ({ navigation }) => {
           />
         </Card>
 
-        {/* Selector de Archivo */}
         <Card containerStyle={styles.fileCard}>
           <Text style={styles.sectionTitle}>Archivo</Text>
           <Divider style={styles.divider} />
@@ -183,11 +225,19 @@ const UploadDocumentScreen = ({ navigation }) => {
           )}
 
           <Text style={styles.helperText}>
-            Formatos permitidos: PDF, imágenes
+            Formatos permitidos: PDF, imágenes (máx. 10MB)
           </Text>
         </Card>
 
-        {/* Botón de Subir */}
+        {uploadProgress > 0 && uploadProgress < 100 && (
+          <Card containerStyle={styles.progressCard}>
+            <Text style={styles.progressText}>Subiendo archivo... {uploadProgress}%</Text>
+            <View style={styles.progressBarContainer}>
+              <View style={[styles.progressBar, { width: `${uploadProgress}%` }]} />
+            </View>
+          </Card>
+        )}
+
         <Button
           title="Subir Documento"
           loading={loading}
@@ -205,7 +255,7 @@ const UploadDocumentScreen = ({ navigation }) => {
       </ScrollView>
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -218,30 +268,37 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#444',
-    marginVertical: 10,
+    marginVertical: 15,
   },
   typeContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginTop: 10,
+    marginTop: 5,
+  },
+  typeButtonWrapper: {
+    width: '48%',
+    marginBottom: 15,
   },
   typeButton: {
-    width: '48%',
-    marginBottom: 10,
     borderColor: '#0077B6',
-    borderRadius: 10,
-    paddingVertical: 10,
+    borderRadius: 12,
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    height: 80,
+    justifyContent: 'center',
   },
   selectedTypeButton: {
     backgroundColor: '#0077B6',
   },
   typeButtonText: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#0077B6',
+    textAlign: 'center',
+    marginTop: 8,
   },
   selectedTypeButtonText: {
     color: 'white',
@@ -283,6 +340,27 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
     marginTop: 10,
+  },
+  progressCard: {
+    borderRadius: 10,
+    marginBottom: 10,
+    padding: 15,
+  },
+  progressText: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  progressBarContainer: {
+    height: 6,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  progressBar: {
+    height: '100%',
+    backgroundColor: '#0077B6',
   },
   submitButton: {
     backgroundColor: '#0077B6',

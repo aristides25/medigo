@@ -88,7 +88,8 @@ const AppNavigator = () => {
         name="PostAppointmentReview" 
         component={PostAppointmentReviewScreen}
         options={{
-          title: 'Califica tu Experiencia',
+          title: 'Calificar Cita',
+          headerBackTitle: 'Atrás'
         }}
       />
       <Stack.Screen 

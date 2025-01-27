@@ -7,71 +7,72 @@ import { PRESCRIPTION_STATUS, PRESCRIPTION_TYPE } from '../../constants/pharmacy
 
 const UploadPrescriptionScreen = ({ navigation, route }) => {
   const [image, setImage] = useState(null);
-  const [uploading, setUploading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const fromCart = route.params?.fromCart || false;
 
-  const pickImage = async () => {
-    try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
-      if (status !== 'granted') {
-        Alert.alert(
-          'Permiso requerido',
-          'Necesitamos acceso a tu galería para subir la receta.'
-        );
-        return;
-      }
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 0.8,
-      });
-
-      if (!result.canceled) {
-        setImage(result.assets[0].uri);
-      }
-    } catch (error) {
-      console.error('Error al seleccionar imagen:', error);
-      Alert.alert('Error', 'No se pudo seleccionar la imagen');
+  const requestCameraPermission = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert(
+        'Permiso denegado',
+        'Necesitamos acceso a la cámara para tomar la foto de la receta.',
+        [{ text: 'OK' }]
+      );
+      return false;
     }
+    return true;
   };
 
   const takePhoto = async () => {
     try {
-      const { status } = await ImagePicker.requestCameraPermissionsAsync();
-      
-      if (status !== 'granted') {
-        Alert.alert(
-          'Permiso requerido',
-          'Necesitamos acceso a tu cámara para tomar la foto.'
-        );
-        return;
-      }
+      const hasPermission = await requestCameraPermission();
+      if (!hasPermission) return;
 
+      setLoading(true);
       const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [4, 3],
-        quality: 0.8,
+        quality: 0.7,
       });
 
       if (!result.canceled) {
         setImage(result.assets[0].uri);
       }
     } catch (error) {
-      console.error('Error al tomar foto:', error);
-      Alert.alert('Error', 'No se pudo tomar la foto');
+      Alert.alert('Error', 'No se pudo tomar la foto. Intente nuevamente.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const pickImage = async () => {
+    try {
+      setLoading(true);
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.7,
+      });
+
+      if (!result.canceled) {
+        setImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'No se pudo seleccionar la imagen. Intente nuevamente.');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleUpload = async () => {
     if (!image) {
-      Alert.alert('Error', 'Por favor, selecciona o toma una foto de la receta');
+      Alert.alert('Error', 'Por favor tome una foto o seleccione una imagen de la receta.');
       return;
     }
 
-    setUploading(true);
+    setLoading(true);
 
     try {
       // Aquí iría la lógica de subida de la imagen
@@ -113,7 +114,7 @@ const UploadPrescriptionScreen = ({ navigation, route }) => {
       console.error('Error al subir receta:', error);
       Alert.alert('Error', 'No se pudo subir la receta');
     } finally {
-      setUploading(false);
+      setLoading(false);
     }
   };
 
@@ -151,12 +152,14 @@ const UploadPrescriptionScreen = ({ navigation, route }) => {
         ) : (
           <View style={styles.buttonContainer}>
             <Button
-              title="Seleccionar de galería"
-              onPress={pickImage}
+              title="Tomar Foto"
+              onPress={takePhoto}
+              loading={loading}
+              disabled={loading}
               buttonStyle={styles.button}
               icon={
                 <Icon
-                  name="image"
+                  name="camera"
                   type="material-community"
                   color="white"
                   size={20}
@@ -165,12 +168,14 @@ const UploadPrescriptionScreen = ({ navigation, route }) => {
               }
             />
             <Button
-              title="Tomar foto"
-              onPress={takePhoto}
-              buttonStyle={[styles.button, styles.cameraButton]}
+              title="Seleccionar de Galería"
+              onPress={pickImage}
+              loading={loading}
+              disabled={loading}
+              buttonStyle={[styles.button, styles.galleryButton]}
               icon={
                 <Icon
-                  name="camera"
+                  name="image"
                   type="material-community"
                   color="white"
                   size={20}
@@ -185,8 +190,8 @@ const UploadPrescriptionScreen = ({ navigation, route }) => {
       <Button
         title="Subir Receta"
         onPress={handleUpload}
-        loading={uploading}
-        disabled={!image || uploading}
+        loading={loading}
+        disabled={!image || loading}
         buttonStyle={[styles.button, styles.uploadButton]}
         icon={
           <Icon
@@ -243,8 +248,8 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     backgroundColor: '#0077B6',
   },
-  cameraButton: {
-    backgroundColor: '#00897B',
+  galleryButton: {
+    backgroundColor: '#666',
   },
   changeButton: {
     backgroundColor: '#FF9800',

@@ -49,7 +49,7 @@ const ProviderCard = ({ provider, onPress }) => {
   return (
     <Card containerStyle={styles.card}>
       <View style={styles.cardHeader}>
-        <View>
+        <View style={styles.nameContainer}>
           <Text style={styles.providerName}>{provider.name}</Text>
           <Text style={styles.specialty}>{provider.specialty}</Text>
         </View>
@@ -57,7 +57,8 @@ const ProviderCard = ({ provider, onPress }) => {
           <Rating
             readonly
             startingValue={provider.rating}
-            imageSize={16}
+            imageSize={14}
+            style={styles.rating}
           />
           <Text style={styles.reviewCount}>({provider.reviewCount} reseñas)</Text>
         </View>
@@ -249,10 +250,15 @@ const styles = StyleSheet.create({
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'flex-start',
     marginBottom: 10,
   },
+  nameContainer: {
+    flex: 1,
+    marginRight: 10,
+  },
   providerName: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#444',
   },
@@ -263,6 +269,10 @@ const styles = StyleSheet.create({
   },
   ratingContainer: {
     alignItems: 'flex-end',
+    flexShrink: 0,
+  },
+  rating: {
+    padding: 0,
   },
   reviewCount: {
     fontSize: 12,

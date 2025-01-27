@@ -45,7 +45,7 @@ const BookAppointmentScreen = ({ route, navigation }) => {
       setLoading(true);
 
       // Combinar fecha y hora
-      const [hours, minutes] = selectedTime.split(':');
+      const [hours, minutes] = selectedTime.match(/(\d+):(\d+)/).slice(1);
       const appointmentDate = new Date(selectedDate);
       appointmentDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
 
@@ -56,7 +56,7 @@ const BookAppointmentScreen = ({ route, navigation }) => {
           specialty: provider.specialty,
           type: provider.type,
         },
-        date: appointmentDate,
+        date: appointmentDate.toISOString(), // Convertir a ISO string para consistencia
         type: 'Consulta General',
         reason,
         notes,
@@ -64,7 +64,7 @@ const BookAppointmentScreen = ({ route, navigation }) => {
 
       if (isRescheduling) {
         // Actualizar la cita existente
-        updateAppointment(originalAppointment.id, {
+        await updateAppointment(originalAppointment.id, {
           ...appointmentData,
           status: 'pendiente', // Resetear el estado al reprogramar
         });
@@ -78,6 +78,7 @@ const BookAppointmentScreen = ({ route, navigation }) => {
                 appointment: {
                   ...originalAppointment,
                   ...appointmentData,
+                  id: originalAppointment.id,
                   status: 'pendiente',
                 }
               }),
@@ -90,7 +91,7 @@ const BookAppointmentScreen = ({ route, navigation }) => {
         );
       } else {
         // Crear nueva cita
-        const newAppointment = createAppointment(appointmentData);
+        const newAppointment = await createAppointment(appointmentData);
         Alert.alert(
           'Cita Agendada',
           'Tu cita ha sido agendada exitosamente',

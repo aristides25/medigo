@@ -1,45 +1,88 @@
-import React from 'react';
-import { View, ScrollView, StyleSheet, Share, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, ScrollView, StyleSheet, Alert, Image, Dimensions } from 'react-native';
 import { Text, Card, Button, Icon, Divider } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as FileSystem from 'expo-file-system';
 import { useMedicalRecord } from '../../context/MedicalRecordContext';
 
 const DocumentDetailScreen = ({ route, navigation }) => {
   const { document } = route.params;
   const { shareDocument } = useMedicalRecord();
+  const [loading, setLoading] = useState(false);
   const date = new Date(document.date);
+  const isPDF = document.file?.type?.includes('pdf');
 
-  // Función para compartir documento
   const handleShare = async () => {
     try {
-      // Por ahora solo mostramos un mensaje
-      Alert.alert(
-        'Función en desarrollo',
-        'La funcionalidad de compartir estará disponible próximamente'
-      );
-      // Aquí iría la lógica real de compartir
-      // const result = await Share.share({
-      //   message: `Documento médico: ${document.title}`,
-      //   url: document.file.uri
-      // });
+      setLoading(true);
+      await shareDocument(document.id);
+      Alert.alert('Éxito', 'Documento compartido correctamente');
     } catch (error) {
       Alert.alert('Error', 'No se pudo compartir el documento');
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Función para descargar documento
-  const handleDownload = () => {
-    // Por ahora solo mostramos un mensaje
-    Alert.alert(
-      'Función en desarrollo',
-      'La funcionalidad de descarga estará disponible próximamente'
+  const handleDownload = async () => {
+    try {
+      setLoading(true);
+      Alert.alert('Información', 'La descarga de documentos estará disponible próximamente');
+    } catch (error) {
+      Alert.alert('Error', 'No se pudo descargar el documento');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const renderPreview = () => {
+    if (!document.file) {
+      return (
+        <View style={styles.previewPlaceholder}>
+          <Icon
+            name="file-document-outline"
+            type="material-community"
+            size={60}
+            color="#666"
+          />
+          <Text style={styles.previewText}>
+            Vista previa no disponible
+          </Text>
+        </View>
+      );
+    }
+
+    if (isPDF) {
+      return (
+        <View style={styles.previewPlaceholder}>
+          <Icon
+            name="file-pdf-box"
+            type="material-community"
+            size={60}
+            color="#0077B6"
+          />
+          <Text style={styles.previewText}>
+            Documento PDF
+          </Text>
+          <Text style={styles.previewSubtext}>
+            {document.file.name}
+          </Text>
+        </View>
+      );
+    }
+
+    return (
+      <Image
+        source={{ uri: document.file.uri }}
+        style={styles.image}
+        resizeMode="contain"
+      />
     );
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        {/* Encabezado del documento */}
         <Card containerStyle={styles.headerCard}>
           <View style={styles.iconContainer}>
             <Icon
@@ -64,6 +107,7 @@ const DocumentDetailScreen = ({ route, navigation }) => {
                 size: 20,
               }}
               onPress={handleShare}
+              loading={loading}
               buttonStyle={[styles.actionButton, styles.shareButton]}
             />
             <Button
@@ -75,64 +119,18 @@ const DocumentDetailScreen = ({ route, navigation }) => {
                 size: 20,
               }}
               onPress={handleDownload}
+              loading={loading}
               buttonStyle={[styles.actionButton, styles.downloadButton]}
             />
           </View>
         </Card>
 
-        {/* Detalles del documento */}
-        <Card containerStyle={styles.detailsCard}>
-          <Text style={styles.sectionTitle}>Detalles del Documento</Text>
-          <Divider style={styles.divider} />
-          
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Tipo:</Text>
-            <Text style={styles.detailValue}>
-              {document.type === 'LAB_RESULT' ? 'Resultado de Laboratorio' : 'Documento Médico'}
-            </Text>
-          </View>
-
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Archivo:</Text>
-            <Text style={styles.detailValue}>{document.file.name}</Text>
-          </View>
-
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Formato:</Text>
-            <Text style={styles.detailValue}>{document.file.type}</Text>
-          </View>
-        </Card>
-
-        {/* Vista previa - Por ahora solo un placeholder */}
         <Card containerStyle={styles.previewCard}>
           <Text style={styles.sectionTitle}>Vista Previa</Text>
           <Divider style={styles.divider} />
-          
-          <View style={styles.previewPlaceholder}>
-            <Icon
-              name="file-pdf-box"
-              type="material-community"
-              size={60}
-              color="#666"
-            />
-            <Text style={styles.previewText}>
-              Vista previa no disponible
-            </Text>
-            <Button
-              title="Ver Documento"
-              onPress={handleDownload}
-              buttonStyle={styles.viewButton}
-              icon={{
-                name: 'eye',
-                type: 'material-community',
-                color: 'white',
-                size: 20,
-              }}
-            />
-          </View>
+          {renderPreview()}
         </Card>
 
-        {/* Historial de compartidos - Por ahora vacío */}
         <Card containerStyle={styles.historyCard}>
           <Text style={styles.sectionTitle}>Historial de Compartidos</Text>
           <Divider style={styles.divider} />
@@ -180,7 +178,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#444',
     textAlign: 'center',
@@ -205,9 +203,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#0077B6',
   },
   downloadButton: {
-    backgroundColor: '#00B4D8',
+    backgroundColor: '#00897B',
   },
-  detailsCard: {
+  previewCard: {
     borderRadius: 10,
     marginBottom: 10,
     padding: 15,
@@ -221,41 +219,29 @@ const styles = StyleSheet.create({
   divider: {
     marginBottom: 15,
   },
-  detailRow: {
-    flexDirection: 'row',
-    marginBottom: 10,
-  },
-  detailLabel: {
-    flex: 1,
-    fontSize: 16,
-    color: '#666',
-  },
-  detailValue: {
-    flex: 2,
-    fontSize: 16,
-    color: '#444',
-  },
-  previewCard: {
+  image: {
+    width: '100%',
+    height: 400,
     borderRadius: 10,
-    marginBottom: 10,
-    padding: 15,
   },
   previewPlaceholder: {
     alignItems: 'center',
-    padding: 30,
+    justifyContent: 'center',
+    padding: 20,
     backgroundColor: '#f9f9f9',
     borderRadius: 10,
+    minHeight: 200,
   },
   previewText: {
     fontSize: 16,
     color: '#666',
-    marginVertical: 10,
-  },
-  viewButton: {
     marginTop: 10,
-    paddingHorizontal: 30,
-    borderRadius: 25,
-    backgroundColor: '#0077B6',
+  },
+  previewSubtext: {
+    fontSize: 14,
+    color: '#888',
+    marginTop: 5,
+    textAlign: 'center',
   },
   historyCard: {
     borderRadius: 10,
@@ -280,10 +266,10 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   emptyHistory: {
-    textAlign: 'center',
-    color: '#666',
     fontSize: 16,
-    fontStyle: 'italic',
+    color: '#666',
+    textAlign: 'center',
+    padding: 20,
   },
 });
 
