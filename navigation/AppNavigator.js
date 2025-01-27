@@ -26,6 +26,22 @@ import NursingNavigator from './NursingNavigator';
 
 const Stack = createNativeStackNavigator();
 
+// Configuración común del header para todos los módulos
+const commonHeaderOptions = {
+  headerStyle: {
+    backgroundColor: '#0077CC', // Tono de azul usado en el módulo de citas
+  },
+  headerTintColor: '#fff',
+  headerTitleStyle: {
+    fontWeight: 'bold',
+  },
+  headerBackTitle: 'MediGo',
+  headerBackTitleStyle: {
+    fontFamily: 'System',
+    fontSize: 14,
+  },
+};
+
 const AppNavigator = () => {
   return (
     <Stack.Navigator
