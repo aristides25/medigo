@@ -20,6 +20,10 @@ import MedicalDocumentsScreen from '../screens/medical-records/MedicalDocumentsS
 import DocumentDetailScreen from '../screens/medical-records/DocumentDetailScreen';
 import UploadDocumentScreen from '../screens/medical-records/UploadDocumentScreen';
 
+// Import new navigators
+import EmergencyNavigator from './EmergencyNavigator';
+import NursingNavigator from './NursingNavigator';
+
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
@@ -167,6 +171,24 @@ const AppNavigator = () => {
         component={UploadDocumentScreen}
         options={{
           title: 'Subir Documento',
+        }}
+      />
+
+      {/* New modules */}
+      <Stack.Screen
+        name="Emergency"
+        component={EmergencyNavigator}
+        options={{ 
+          title: 'Emergencias',
+          headerShown: false 
+        }}
+      />
+      <Stack.Screen
+        name="Nursing"
+        component={NursingNavigator}
+        options={{ 
+          title: 'Servicios de Enfermería',
+          headerShown: false 
         }}
       />
     </Stack.Navigator>
