@@ -4,7 +4,8 @@ import { Text, Button, Icon, SearchBar } from '@rneui/themed';
 import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
 
-const EmergencyMapScreen = ({ navigation }) => {
+const EmergencyMapScreen = ({ navigation, route }) => {
+  const { emergencyType } = route.params || {};
   const [location, setLocation] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -117,7 +118,8 @@ const EmergencyMapScreen = ({ navigation }) => {
     navigation.navigate('EmergencyTracking', {
       selectedLocation,
       selectedAddress,
-      userLocation: location
+      userLocation: location,
+      emergencyType
     });
   };
 
@@ -132,6 +134,18 @@ const EmergencyMapScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.emergencyTypeContainer}>
+        <Icon
+          name={emergencyType?.icon || 'ambulance'}
+          type="font-awesome"
+          size={24}
+          color={emergencyType?.color || '#e74c3c'}
+        />
+        <Text style={styles.emergencyTypeText}>
+          {emergencyType?.title || 'Servicio de Ambulancia'}
+        </Text>
+      </View>
+
       {location && (
         <MapView
           style={styles.map}
@@ -191,7 +205,7 @@ const EmergencyMapScreen = ({ navigation }) => {
         )}
 
         <TouchableOpacity 
-          style={styles.confirmButton}
+          style={[styles.confirmButton, { backgroundColor: emergencyType?.color || '#e74c3c' }]}
           onPress={handleConfirmLocation}
         >
           <Text style={styles.confirmButtonText}>Solicitar Ambulancia</Text>
@@ -205,6 +219,32 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  emergencyTypeContainer: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    zIndex: 1,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  emergencyTypeText: {
+    marginLeft: 10,
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
   },
   loadingContainer: {
     flex: 1,
@@ -249,53 +289,45 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   searchBarInputContainer: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#f5f5f5',
     borderRadius: 8,
-    height: 45,
   },
   searchBarInput: {
-    color: '#000',
+    fontSize: 16,
   },
   searchResults: {
     backgroundColor: '#fff',
     borderRadius: 8,
-    maxHeight: 200,
     marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    maxHeight: 200,
   },
   resultsList: {
-    padding: 10,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    borderRadius: 8,
   },
   resultItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
+    padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: '#e0e0e0',
   },
   resultText: {
     marginLeft: 10,
     fontSize: 14,
-    color: '#2c3e50',
+    color: '#333',
   },
   confirmButton: {
     backgroundColor: '#e74c3c',
-    height: 56,
-    borderRadius: 8,
-    justifyContent: 'center',
+    paddingVertical: 15,
+    borderRadius: 25,
     alignItems: 'center',
     marginTop: 10,
   },
   confirmButtonText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
   },
 });

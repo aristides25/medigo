@@ -10,7 +10,7 @@ import ReviewsScreen from '../screens/appointments/ReviewsScreen';
 import PostAppointmentReviewScreen from '../screens/appointments/PostAppointmentReviewScreen';
 import AppointmentDetailScreen from '../screens/appointments/AppointmentDetailScreen';
 import PharmacyScreen from '../screens/pharmacy/PharmacyScreen';
-import CategoryProductsScreen from '../screens/pharmacy/CategoryProductsScreen';
+import PharmacyProductsScreen from '../screens/pharmacy/PharmacyProductsScreen';
 import ProductDetailScreen from '../screens/pharmacy/ProductDetailScreen';
 import CartScreen from '../screens/pharmacy/CartScreen';
 import MyPrescriptionsScreen from '../screens/pharmacy/MyPrescriptionsScreen';
@@ -23,6 +23,7 @@ import UploadDocumentScreen from '../screens/medical-records/UploadDocumentScree
 // Import new navigators
 import EmergencyNavigator from './EmergencyNavigator';
 import NursingNavigator from './NursingNavigator';
+import TelemedicineNavigator from './TelemedicineNavigator';
 
 const Stack = createNativeStackNavigator();
 
@@ -127,18 +128,18 @@ const AppNavigator = () => {
         }}
       />
       <Stack.Screen 
-        name="CategoryProducts" 
-        component={CategoryProductsScreen}
-        options={({ route }) => ({
-          title: route.params.category.name,
-        })}
+        name="PharmacyProducts" 
+        component={PharmacyProductsScreen}
+        options={{
+          animation: 'slide_from_right'
+        }}
       />
       <Stack.Screen 
         name="ProductDetail" 
         component={ProductDetailScreen}
-        options={({ route }) => ({
-          title: 'Detalle del Producto',
-        })}
+        options={{
+          animation: 'slide_from_right'
+        }}
       />
       <Stack.Screen 
         name="Cart" 
@@ -201,6 +202,13 @@ const AppNavigator = () => {
       <Stack.Screen
         name="Nursing"
         component={NursingNavigator}
+        options={{ 
+          headerShown: false
+        }}
+      />
+      <Stack.Screen
+        name="Telemedicine"
+        component={TelemedicineNavigator}
         options={{ 
           headerShown: false
         }}
