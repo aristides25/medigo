@@ -32,7 +32,7 @@ const modules = [
     title: 'Emergencias',
     icon: 'ambulance',
     description: 'Servicios de emergencia y ambulancia',
-    route: 'EmergencyType'
+    route: 'EmergencyMap'
   },
   {
     title: 'Servicios de Enfermería',

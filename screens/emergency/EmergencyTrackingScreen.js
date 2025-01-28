@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Dimensions, Alert } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, StyleSheet, Dimensions, Alert, Animated } from 'react-native';
 import { Text, Button, Icon } from '@rneui/themed';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -10,6 +10,67 @@ const ESTADOS_SERVICIO = {
   EN_CAMINO: { label: 'Ambulancia en camino', progress: 0.5 },
   LLEGANDO: { label: 'Ambulancia llegando', progress: 0.75 },
   COMPLETADO: { label: 'Servicio completado', progress: 1 },
+};
+
+const PulseMarker = ({ coordinate }) => {
+  const pulseAnimation = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const animate = () => {
+      Animated.sequence([
+        Animated.timing(pulseAnimation, {
+          toValue: 1,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnimation, {
+          toValue: 0,
+          duration: 0,
+          useNativeDriver: true,
+        }),
+      ]).start(() => animate());
+    };
+
+    animate();
+  }, []);
+
+  const scale = pulseAnimation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 4],
+  });
+
+  const opacity = pulseAnimation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 0],
+  });
+
+  return (
+    <Marker coordinate={coordinate}>
+      <View style={styles.markerContainer}>
+        <Animated.View
+          style={[
+            styles.pulse,
+            {
+              transform: [{ scale }],
+              opacity,
+            },
+          ]}
+        />
+        <Animated.View
+          style={[
+            styles.pulse,
+            {
+              transform: [{ scale: Animated.multiply(scale, 0.75) }],
+              opacity,
+            },
+          ]}
+        />
+        <View style={styles.marker}>
+          <Icon name="place" type="material" color="#e74c3c" size={40} />
+        </View>
+      </View>
+    </Marker>
+  );
 };
 
 const EmergencyTrackingScreen = ({ route, navigation }) => {
@@ -106,14 +167,21 @@ const EmergencyTrackingScreen = ({ route, navigation }) => {
           />
         )}
 
-        {/* Marcador del destino */}
-        <Marker
-          coordinate={selectedLocation}
-          title="Destino"
-          description={selectedAddress}
-        >
-          <Icon name="place" type="material" color="#e74c3c" size={40} />
-        </Marker>
+        {/* Marcador pulsante del destino */}
+        {currentState === 'BUSCANDO' && (
+          <PulseMarker coordinate={selectedLocation} />
+        )}
+
+        {/* Marcador normal del destino cuando no está buscando */}
+        {currentState !== 'BUSCANDO' && (
+          <Marker
+            coordinate={selectedLocation}
+            title="Destino"
+            description={selectedAddress}
+          >
+            <Icon name="place" type="material" color="#e74c3c" size={40} />
+          </Marker>
+        )}
 
         {/* Marcador de la ambulancia */}
         {ambulanceLocation && (
@@ -242,6 +310,27 @@ const styles = StyleSheet.create({
   completeButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  markerContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 40,
+    height: 40,
+  },
+  pulse: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    borderWidth: 4,
+    borderColor: '#e74c3c',
+    borderRadius: 40,
+    backgroundColor: 'transparent',
+  },
+  marker: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

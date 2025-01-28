@@ -1,33 +1,33 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { Button, Card, Text, Icon } from '@rneui/themed';
+import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { Button, Text, Icon } from '@rneui/themed';
 
 const emergencyTypes = [
   {
     id: 1,
     title: 'Traslado Médico',
-    description: 'Traslado programado a centro médico, hospital o clínica',
+    description: 'Traslado programado a centro médico',
     icon: 'ambulance',
     color: '#4CAF50'
   },
   {
     id: 2,
     title: 'Accidente',
-    description: 'Atención inmediata por accidente o emergencia',
+    description: 'Atención inmediata por accidente',
     icon: 'exclamation-triangle',
     color: '#F44336'
   },
   {
     id: 3,
     title: 'Emergencia Médica',
-    description: 'Atención por crisis de salud o emergencia médica',
+    description: 'Atención por crisis de salud',
     icon: 'heartbeat',
     color: '#E91E63'
   },
   {
     id: 4,
     title: 'Alta Médica',
-    description: 'Traslado desde centro médico a domicilio',
+    description: 'Traslado desde centro médico',
     icon: 'hospital-o',
     color: '#2196F3'
   },
@@ -37,13 +37,6 @@ const emergencyTypes = [
     description: 'Traslado entre centros médicos',
     icon: 'exchange',
     color: '#9C27B0'
-  },
-  {
-    id: 6,
-    title: 'Otros Motivos',
-    description: 'Otros tipos de emergencias o traslados',
-    icon: 'plus-circle',
-    color: '#607D8B'
   }
 ];
 
@@ -54,30 +47,28 @@ const EmergencyTypeScreen = ({ navigation }) => {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.header}>¿Qué tipo de servicio necesitas?</Text>
-      <Text style={styles.subheader}>Selecciona el motivo de la ambulancia</Text>
+      <Text style={styles.header}>Servicios de Emergencia</Text>
+      <Text style={styles.subheader}>Selecciona el tipo de servicio que necesitas</Text>
 
-      <View style={styles.cardsContainer}>
+      <View style={styles.servicesContainer}>
         {emergencyTypes.map((type) => (
-          <Card key={type.id} containerStyle={styles.card}>
-            <View style={styles.cardContent}>
-              <Icon
-                name={type.icon}
-                type="font-awesome"
-                size={30}
-                color={type.color}
-                containerStyle={styles.iconContainer}
-              />
-              <Card.Title style={styles.cardTitle}>{type.title}</Card.Title>
-              <Text style={styles.cardDescription}>{type.description}</Text>
-              <Button
-                title="Seleccionar"
-                onPress={() => handleSelectType(type)}
-                buttonStyle={[styles.button, { backgroundColor: type.color }]}
-                titleStyle={styles.buttonText}
-              />
+          <TouchableOpacity 
+            key={type.id} 
+            style={styles.serviceCard}
+            onPress={() => handleSelectType(type)}
+          >
+            <Icon
+              name={type.icon}
+              type="font-awesome"
+              size={24}
+              color={type.color}
+              containerStyle={styles.iconContainer}
+            />
+            <View style={styles.serviceInfo}>
+              <Text style={styles.serviceTitle}>{type.title}</Text>
+              <Text style={styles.serviceDescription}>{type.description}</Text>
             </View>
-          </Card>
+          </TouchableOpacity>
         ))}
       </View>
     </ScrollView>
@@ -103,46 +94,42 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: '#666',
   },
-  cardsContainer: {
-    paddingHorizontal: 10,
+  servicesContainer: {
+    paddingHorizontal: 15,
     paddingBottom: 20,
   },
-  card: {
-    borderRadius: 15,
-    marginBottom: 15,
-    padding: 15,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  cardContent: {
+  serviceCard: {
+    flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
   },
   iconContainer: {
-    marginBottom: 10,
+    width: 50,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
   },
-  cardTitle: {
-    fontSize: 18,
-    marginBottom: 8,
-    color: '#333',
+  serviceInfo: {
+    flex: 1,
   },
-  cardDescription: {
-    textAlign: 'center',
-    marginBottom: 15,
-    color: '#666',
-    fontSize: 14,
-  },
-  button: {
-    borderRadius: 25,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginTop: 10,
-  },
-  buttonText: {
+  serviceTitle: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 4,
+  },
+  serviceDescription: {
+    fontSize: 14,
+    color: '#666',
   },
 });
 

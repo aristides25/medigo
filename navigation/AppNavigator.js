@@ -224,7 +224,7 @@ const AppNavigator = () => {
           name="EmergencyMap" 
           component={EmergencyMapScreen}
           options={{
-            title: 'Ubicación de Emergencia',
+            title: 'Servicio de Ambulancia',
           }}
         />
         <Stack.Screen 
