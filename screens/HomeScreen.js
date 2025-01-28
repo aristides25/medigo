@@ -26,19 +26,19 @@ const modules = [
     title: 'Telemedicina',
     icon: 'video',
     description: 'Consultas médicas en línea',
-    route: 'Telemedicine'
+    route: 'TelemedicineHome'
   },
   {
     title: 'Emergencias',
     icon: 'ambulance',
     description: 'Servicios de emergencia y ambulancia',
-    route: 'Emergency'
+    route: 'EmergencyMap'
   },
   {
     title: 'Servicios de Enfermería',
     icon: 'heart-pulse',
     description: 'Contrata servicios de enfermería a domicilio',
-    route: 'Nursing'
+    route: 'NursingHome'
   }
 ];
 

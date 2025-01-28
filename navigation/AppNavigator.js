@@ -1,6 +1,10 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useTheme } from '@rneui/themed';
+
+// Screens imports
 import HomeScreen from '../screens/HomeScreen';
+// Appointments
 import AppointmentsScreen from '../screens/appointments/AppointmentsScreen';
 import SearchProvidersScreen from '../screens/appointments/SearchProvidersScreen';
 import ProviderDetailScreen from '../screens/appointments/ProviderDetailScreen';
@@ -9,52 +13,50 @@ import PaymentScreen from '../screens/appointments/PaymentScreen';
 import ReviewsScreen from '../screens/appointments/ReviewsScreen';
 import PostAppointmentReviewScreen from '../screens/appointments/PostAppointmentReviewScreen';
 import AppointmentDetailScreen from '../screens/appointments/AppointmentDetailScreen';
+// Pharmacy
 import PharmacyScreen from '../screens/pharmacy/PharmacyScreen';
 import CategoryProductsScreen from '../screens/pharmacy/CategoryProductsScreen';
 import ProductDetailScreen from '../screens/pharmacy/ProductDetailScreen';
 import CartScreen from '../screens/pharmacy/CartScreen';
 import MyPrescriptionsScreen from '../screens/pharmacy/MyPrescriptionsScreen';
 import UploadPrescriptionScreen from '../screens/pharmacy/UploadPrescriptionScreen';
+// Medical Records
 import MedicalRecordsScreen from '../screens/medical-records/MedicalRecordsScreen';
 import MedicalDocumentsScreen from '../screens/medical-records/MedicalDocumentsScreen';
 import DocumentDetailScreen from '../screens/medical-records/DocumentDetailScreen';
 import UploadDocumentScreen from '../screens/medical-records/UploadDocumentScreen';
-
-// Import new navigators
-import EmergencyNavigator from './EmergencyNavigator';
-import NursingNavigator from './NursingNavigator';
+// Emergency
+import EmergencyMapScreen from '../screens/emergency/EmergencyMapScreen';
+import EmergencyTrackingScreen from '../screens/emergency/EmergencyTrackingScreen';
+// Nursing
+import NursingHomeScreen from '../screens/nursing/NursingHomeScreen';
+import NursingServiceDetailScreen from '../screens/nursing/NursingServiceDetailScreen';
+import NursingBookingScreen from '../screens/nursing/NursingBookingScreen';
+import NursingTrackingScreen from '../screens/nursing/NursingTrackingScreen';
 
 const Stack = createNativeStackNavigator();
 
-// Configuración común del header para todos los módulos
-const commonHeaderOptions = {
-  headerStyle: {
-    backgroundColor: '#0077CC', // Tono de azul usado en el módulo de citas
-  },
-  headerTintColor: '#fff',
-  headerTitleStyle: {
-    fontWeight: 'bold',
-  },
-  headerBackTitle: 'MediGo',
-  headerBackTitleStyle: {
-    fontFamily: 'System',
-    fontSize: 14,
-  },
-};
-
 const AppNavigator = () => {
+  const { theme } = useTheme();
+
+  const screenOptions = {
+    headerStyle: {
+      backgroundColor: theme.colors.primary,
+    },
+    headerTintColor: theme.colors.white,
+    headerTitleStyle: {
+      fontWeight: 'bold',
+    },
+    headerBackTitle: 'MediGo',
+    headerBackTitleStyle: {
+      fontFamily: 'System',
+      fontSize: 14,
+    },
+  };
+
   return (
-    <Stack.Navigator
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: '#0077B6',
-        },
-        headerTintColor: '#fff',
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
-      }}
-    >
+    <Stack.Navigator screenOptions={screenOptions}>
+      {/* Home */}
       <Stack.Screen 
         name="Home" 
         component={HomeScreen}
@@ -62,6 +64,8 @@ const AppNavigator = () => {
           title: 'MediGo',
         }}
       />
+
+      {/* Appointments */}
       <Stack.Screen 
         name="Appointments" 
         component={AppointmentsScreen}
@@ -109,7 +113,6 @@ const AppNavigator = () => {
         component={PostAppointmentReviewScreen}
         options={{
           title: 'Calificar Cita',
-          headerBackTitle: 'Atrás'
         }}
       />
       <Stack.Screen 
@@ -119,6 +122,8 @@ const AppNavigator = () => {
           title: 'Detalles de la Cita',
         }}
       />
+
+      {/* Pharmacy */}
       <Stack.Screen 
         name="Pharmacy" 
         component={PharmacyScreen}
@@ -136,9 +141,9 @@ const AppNavigator = () => {
       <Stack.Screen 
         name="ProductDetail" 
         component={ProductDetailScreen}
-        options={({ route }) => ({
+        options={{
           title: 'Detalle del Producto',
-        })}
+        }}
       />
       <Stack.Screen 
         name="Cart" 
@@ -161,6 +166,8 @@ const AppNavigator = () => {
           title: 'Subir Receta',
         }}
       />
+
+      {/* Medical Records */}
       <Stack.Screen 
         name="MedicalRecords" 
         component={MedicalRecordsScreen}
@@ -190,19 +197,49 @@ const AppNavigator = () => {
         }}
       />
 
-      {/* New modules */}
-      <Stack.Screen
-        name="Emergency"
-        component={EmergencyNavigator}
-        options={{ 
-          headerShown: false
+      {/* Emergency */}
+      <Stack.Screen 
+        name="EmergencyMap" 
+        component={EmergencyMapScreen}
+        options={{
+          title: 'Emergencias',
         }}
       />
-      <Stack.Screen
-        name="Nursing"
-        component={NursingNavigator}
-        options={{ 
-          headerShown: false
+      <Stack.Screen 
+        name="EmergencyTracking" 
+        component={EmergencyTrackingScreen}
+        options={{
+          title: 'Seguimiento de Ambulancia',
+        }}
+      />
+
+      {/* Nursing */}
+      <Stack.Screen 
+        name="NursingHome" 
+        component={NursingHomeScreen}
+        options={{
+          title: 'Servicios de Enfermería',
+        }}
+      />
+      <Stack.Screen 
+        name="NursingServiceDetail" 
+        component={NursingServiceDetailScreen}
+        options={{
+          title: 'Detalle del Servicio',
+        }}
+      />
+      <Stack.Screen 
+        name="NursingBooking" 
+        component={NursingBookingScreen}
+        options={{
+          title: 'Reservar Servicio',
+        }}
+      />
+      <Stack.Screen 
+        name="NursingTracking" 
+        component={NursingTrackingScreen}
+        options={{
+          title: 'Seguimiento del Servicio',
         }}
       />
     </Stack.Navigator>
