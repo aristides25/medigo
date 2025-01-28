@@ -1,9 +1,27 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Card } from '@rneui/themed';
+import { Card, Button } from '@rneui/themed';
+import moment from 'moment';
+import 'moment/locale/es';
 
-const NursingTrackingScreen = ({ route }) => {
+moment.locale('es');
+
+const NursingTrackingScreen = ({ route, navigation }) => {
   const { booking } = route.params || {};
+
+  const formatDate = (date) => {
+    if (!date) return 'No disponible';
+    return moment(date).format('LL');
+  };
+
+  const formatTime = (time) => {
+    if (!time) return 'No disponible';
+    return moment(time, 'HH:mm').format('hh:mm A');
+  };
+
+  const handleGoHome = () => {
+    navigation.navigate('Home');
+  };
 
   return (
     <View style={styles.container}>
@@ -13,16 +31,16 @@ const NursingTrackingScreen = ({ route }) => {
         
         <View style={styles.infoContainer}>
           <Text style={styles.label}>Fecha:</Text>
-          <Text>{booking?.date || 'No disponible'}</Text>
+          <Text style={styles.value}>{formatDate(booking?.date)}</Text>
           
           <Text style={styles.label}>Hora:</Text>
-          <Text>{booking?.time || 'No disponible'}</Text>
+          <Text style={styles.value}>{formatTime(booking?.time)}</Text>
           
           <Text style={styles.label}>Duración:</Text>
-          <Text>{booking?.duration || 'No disponible'}</Text>
+          <Text style={styles.value}>{booking?.duration || 'No disponible'}</Text>
           
           <Text style={styles.label}>Dirección:</Text>
-          <Text>{booking?.address || 'No disponible'}</Text>
+          <Text style={styles.value}>{booking?.address || 'No disponible'}</Text>
         </View>
       </Card>
       
@@ -30,6 +48,21 @@ const NursingTrackingScreen = ({ route }) => {
         <Card.Title>Enfermero/a Asignado/a</Card.Title>
         <Text style={styles.nurseInfo}>Por asignar</Text>
       </Card>
+
+      <Button
+        title="Volver al Inicio"
+        onPress={handleGoHome}
+        containerStyle={styles.buttonContainer}
+        buttonStyle={styles.button}
+        titleStyle={styles.buttonText}
+        icon={{
+          name: 'home',
+          type: 'font-awesome',
+          size: 20,
+          color: 'white',
+        }}
+        iconRight
+      />
     </View>
   );
 };
@@ -43,6 +76,11 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 8,
     marginBottom: 16,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   status: {
     fontSize: 18,
@@ -59,10 +97,32 @@ const styles = StyleSheet.create({
     marginTop: 8,
     color: '#666',
   },
+  value: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 8,
+  },
   nurseInfo: {
     textAlign: 'center',
     fontSize: 16,
     color: '#666',
+  },
+  buttonContainer: {
+    marginTop: 20,
+    paddingHorizontal: 20,
+  },
+  button: {
+    backgroundColor: '#0077CC',
+    borderRadius: 25,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginRight: 10,
   },
 });
 
