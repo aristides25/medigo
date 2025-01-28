@@ -1,7 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
-import { SearchBar, Button, Text, ButtonGroup, LinearProgress, Card, Rating } from '@rneui/themed';
+import { View, ScrollView, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { Text, SearchBar, Button, ButtonGroup, Card, Rating, Icon } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+
+// Constantes de diseño
+const SPACING = 8;
+const COLORS = {
+  primary: '#0077B6',
+  primaryLight: '#E1F5FE',
+  success: '#4CAF50',
+  warning: '#FFC107',
+  danger: '#F44336',
+  grey: '#757575',
+  white: '#FFFFFF',
+  background: '#F5F7FA',
+  cardBg: 'rgba(255, 255, 255, 0.95)',
+};
 
 // Datos de ejemplo - Esto se reemplazará con datos reales del backend
 const MOCK_PROVIDERS = [
@@ -46,33 +61,81 @@ const MOCK_PROVIDERS = [
 const filterButtons = ['Todos', 'Médicos', 'Clínicas', 'Hospitales'];
 
 const ProviderCard = ({ provider, onPress }) => {
+  const getProviderIcon = (type) => {
+    switch(type) {
+      case 'Doctor':
+        return 'doctor';
+      case 'Clínica':
+        return 'hospital-building';
+      case 'Hospital':
+        return 'hospital';
+      default:
+        return 'medical-bag';
+    }
+  };
+
   return (
-    <Card containerStyle={styles.card}>
-      <View style={styles.cardHeader}>
-        <View style={styles.nameContainer}>
-          <Text style={styles.providerName}>{provider.name}</Text>
-          <Text style={styles.specialty}>{provider.specialty}</Text>
+    <TouchableOpacity 
+      onPress={() => onPress(provider)}
+      activeOpacity={0.7}
+      style={styles.cardContainer}
+    >
+      <LinearGradient
+        colors={[COLORS.cardBg, COLORS.white]}
+        style={styles.cardGradient}
+      >
+        <View style={styles.cardHeader}>
+          <View style={styles.providerIconContainer}>
+            <Icon
+              name={getProviderIcon(provider.type)}
+              type="material-community"
+              size={32}
+              color={COLORS.primary}
+            />
+          </View>
+          <View style={styles.providerInfo}>
+            <Text style={styles.providerName}>{provider.name}</Text>
+            <Text style={styles.specialty}>{provider.specialty}</Text>
+            <View style={styles.ratingContainer}>
+              <Rating
+                readonly
+                startingValue={provider.rating}
+                imageSize={16}
+                style={styles.rating}
+              />
+              <Text style={styles.reviewCount}>({provider.reviewCount} reseñas)</Text>
+            </View>
+          </View>
         </View>
-        <View style={styles.ratingContainer}>
-          <Rating
-            readonly
-            startingValue={provider.rating}
-            imageSize={14}
-            style={styles.rating}
-          />
-          <Text style={styles.reviewCount}>({provider.reviewCount} reseñas)</Text>
+
+        <View style={styles.detailsContainer}>
+          <View style={styles.detailRow}>
+            <Icon name="map-marker" type="material-community" size={16} color={COLORS.grey} />
+            <Text style={styles.detailText}>{provider.address}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Icon name="clock-outline" type="material-community" size={16} color={COLORS.success} />
+            <Text style={[styles.detailText, { color: COLORS.success }]}>
+              Disponible: {provider.availability}
+            </Text>
+          </View>
         </View>
-      </View>
 
-      <Text style={styles.address}>{provider.address}</Text>
-      <Text style={styles.availability}>Próximo turno: {provider.availability}</Text>
-
-      <Button
-        title="Seleccionar"
-        onPress={() => onPress(provider)}
-        buttonStyle={styles.selectButton}
-      />
-    </Card>
+        <Button
+          title="Ver Detalles"
+          onPress={() => onPress(provider)}
+          buttonStyle={styles.detailsButton}
+          titleStyle={styles.buttonText}
+          icon={{
+            name: 'chevron-right',
+            type: 'material-community',
+            size: 20,
+            color: COLORS.white,
+          }}
+          iconRight
+        />
+      </LinearGradient>
+    </TouchableOpacity>
   );
 };
 
@@ -84,18 +147,9 @@ const SearchProvidersScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
 
   const handleProviderSelect = (provider) => {
-    navigation.navigate('ProviderDetail', {
-      provider: {
-        ...provider,
-        id: provider.id,
-        name: provider.name,
-        type: provider.type,
-        specialty: provider.specialty,
-        rating: provider.rating,
-        reviewCount: provider.reviewCount,
-        address: provider.address,
-        description: provider.description,
-      }
+    navigation.navigate('BookAppointment', { 
+      provider,
+      isRescheduling: false
     });
   };
 
@@ -138,46 +192,64 @@ const SearchProvidersScreen = ({ navigation }) => {
     setFilteredProviders(filtered);
   };
 
-  // Efecto para aplicar filtros cuando cambian los criterios
   useEffect(() => {
     filterProviders();
   }, [search, selectedIndex]);
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+      <LinearGradient
+        colors={[COLORS.primaryLight, COLORS.background]}
+        style={styles.headerGradient}
+      >
+        <View style={styles.header}>
+          <Text style={styles.title}>Buscar Proveedores</Text>
+          <Text style={styles.subtitle}>Encuentra el proveedor médico que necesitas</Text>
+        </View>
+
         <SearchBar
-          placeholder="Buscar médicos, clínicas..."
+          placeholder="Buscar por nombre o especialidad..."
           onChangeText={updateSearch}
           value={search}
-          platform="android"
+          platform="default"
           containerStyle={styles.searchContainer}
           inputContainerStyle={styles.searchInputContainer}
-          lightTheme
-          round
-          showLoading={loading}
-          cancelButtonTitle="Cancelar"
-          cancelButtonProps={{ color: '#0077B6' }}
+          inputStyle={styles.searchInput}
+          searchIcon={
+            <Icon name="magnify" type="material-community" color={COLORS.primary} size={24} />
+          }
+          clearIcon={
+            <Icon 
+              name="close" 
+              type="material-community" 
+              color={COLORS.grey} 
+              size={24} 
+              onPress={() => setSearch('')}
+            />
+          }
         />
-      </View>
 
-      <ButtonGroup
-        buttons={filterButtons}
-        selectedIndex={selectedIndex}
-        onPress={setSelectedIndex}
-        containerStyle={styles.buttonGroupContainer}
-        selectedButtonStyle={styles.selectedButton}
-        textStyle={styles.buttonGroupText}
-        selectedTextStyle={styles.selectedButtonText}
-        buttonContainerStyle={styles.buttonContainer}
-      />
+        <ButtonGroup
+          buttons={filterButtons}
+          selectedIndex={selectedIndex}
+          onPress={setSelectedIndex}
+          containerStyle={styles.buttonGroupContainer}
+          selectedButtonStyle={styles.selectedButton}
+          textStyle={styles.buttonGroupText}
+          selectedTextStyle={styles.selectedButtonText}
+          buttonContainerStyle={styles.buttonContainer}
+        />
+      </LinearGradient>
 
-      {loading && <LinearProgress color="#0077B6" style={styles.progress} />}
-
-      <ScrollView style={styles.content}>
+      <ScrollView 
+        style={styles.content}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         <Text style={styles.resultsText}>
           {filteredProviders.length} proveedores encontrados
         </Text>
+
         {filteredProviders.map((provider) => (
           <ProviderCard
             key={provider.id}
@@ -193,106 +265,183 @@ const SearchProvidersScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: COLORS.background,
+  },
+  headerGradient: {
+    paddingTop: SPACING * 2,
+    paddingBottom: SPACING * 3,
   },
   header: {
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    padding: SPACING * 2,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+    marginBottom: SPACING,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: COLORS.grey,
+    marginBottom: SPACING * 2,
   },
   searchContainer: {
     backgroundColor: 'transparent',
     borderTopWidth: 0,
     borderBottomWidth: 0,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
+    paddingHorizontal: SPACING * 2,
+    marginBottom: SPACING * 2,
   },
   searchInputContainer: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: COLORS.white,
+    borderRadius: SPACING * 3,
+    height: 48,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+  },
+  searchInput: {
+    fontSize: 16,
+    color: '#333',
   },
   buttonGroupContainer: {
-    marginHorizontal: 15,
-    marginVertical: 10,
-    height: 40,
-    borderRadius: 20,
-    borderColor: '#0077B6',
+    marginHorizontal: SPACING * 2,
+    height: 44,
+    borderRadius: 22,
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.white,
+    marginBottom: 0,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   buttonContainer: {
-    borderRadius: 20,
+    borderRadius: 22,
   },
   selectedButton: {
-    backgroundColor: '#0077B6',
+    backgroundColor: COLORS.primary,
   },
   buttonGroupText: {
-    color: '#0077B6',
+    color: COLORS.primary,
     fontSize: 14,
+    fontWeight: '500',
   },
   selectedButtonText: {
-    color: '#fff',
+    color: COLORS.white,
     fontWeight: 'bold',
-  },
-  progress: {
-    marginHorizontal: 15,
   },
   content: {
     flex: 1,
-    padding: 15,
+  },
+  scrollContent: {
+    padding: SPACING * 2,
   },
   resultsText: {
     fontSize: 14,
-    color: '#666',
-    marginBottom: 15,
+    color: COLORS.grey,
+    marginBottom: SPACING * 2,
   },
-  card: {
-    borderRadius: 10,
-    marginBottom: 10,
+  cardContainer: {
+    marginBottom: SPACING * 2,
+    borderRadius: SPACING * 2,
+    overflow: 'hidden',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+  },
+  cardGradient: {
+    padding: SPACING * 2,
+    borderRadius: SPACING * 2,
   },
   cardHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 10,
+    marginBottom: SPACING * 2,
   },
-  nameContainer: {
+  providerIconContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: `${COLORS.primary}15`,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: SPACING * 2,
+  },
+  providerInfo: {
     flex: 1,
-    marginRight: 10,
   },
   providerName: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#444',
+    color: '#333',
+    marginBottom: SPACING / 2,
   },
   specialty: {
     fontSize: 14,
-    color: '#666',
-    marginTop: 2,
+    color: COLORS.grey,
+    marginBottom: SPACING,
   },
   ratingContainer: {
-    alignItems: 'flex-end',
-    flexShrink: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   rating: {
-    padding: 0,
+    marginRight: SPACING,
   },
   reviewCount: {
     fontSize: 12,
-    color: '#666',
-    marginTop: 2,
+    color: COLORS.grey,
   },
-  address: {
+  detailsContainer: {
+    backgroundColor: `${COLORS.primary}05`,
+    borderRadius: SPACING,
+    padding: SPACING * 2,
+    marginBottom: SPACING * 2,
+  },
+  detailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING,
+  },
+  detailText: {
+    marginLeft: SPACING,
     fontSize: 14,
-    color: '#666',
-    marginBottom: 5,
+    color: COLORS.grey,
+    flex: 1,
   },
-  availability: {
-    fontSize: 14,
-    color: '#4CAF50',
-    marginBottom: 10,
+  detailsButton: {
+    backgroundColor: COLORS.primary,
+    borderRadius: SPACING * 3,
+    paddingVertical: SPACING * 1.5,
+    paddingHorizontal: SPACING * 3,
   },
-  selectButton: {
-    backgroundColor: '#0077B6',
-    borderRadius: 8,
-    marginTop: 5,
+  buttonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginRight: SPACING,
   },
 });
 

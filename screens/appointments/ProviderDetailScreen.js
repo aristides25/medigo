@@ -1,95 +1,204 @@
 import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import { Text, Button, Card, Icon, ListItem, Divider, Rating } from '@rneui/themed';
+import { View, ScrollView, StyleSheet, TouchableOpacity, Dimensions, Platform } from 'react-native';
+import { Text, Button, Icon, Avatar, Divider, Rating } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 
-const MOCK_SCHEDULE = [
-  { id: 1, day: 'Lunes', hours: '9:00 AM - 5:00 PM' },
-  { id: 2, day: 'Martes', hours: '9:00 AM - 5:00 PM' },
-  { id: 3, day: 'Miércoles', hours: '9:00 AM - 5:00 PM' },
-  { id: 4, day: 'Jueves', hours: '9:00 AM - 5:00 PM' },
-  { id: 5, day: 'Viernes', hours: '9:00 AM - 3:00 PM' },
-];
+// Constantes de diseño (mantener consistencia)
+const SPACING = 8;
+const COLORS = {
+  primary: '#0077B6',
+  primaryLight: '#E1F5FE',
+  success: '#4CAF50',
+  warning: '#FFC107',
+  danger: '#F44336',
+  grey: '#757575',
+  white: '#FFFFFF',
+  background: '#F5F7FA',
+  cardBg: 'rgba(255, 255, 255, 0.95)',
+};
 
-const MOCK_SERVICES = [
-  { id: 1, name: 'Consulta General', price: '$50.00' },
-  { id: 2, name: 'Consulta Especializada', price: '$75.00' },
-  { id: 3, name: 'Procedimientos Menores', price: '$100.00' },
-];
+// Datos de ejemplo del doctor
+const DOCTOR_DATA = {
+  id: '1',
+  name: 'Dr. Juan Pérez',
+  specialty: 'Medicina General',
+  rating: 4.8,
+  reviews: 124,
+  experience: '15 años',
+  education: 'Universidad Central de Venezuela',
+  description: 'Especialista en medicina familiar con amplia experiencia en atención primaria y preventiva. Enfoque integral en la salud del paciente.',
+  languages: ['Español', 'Inglés'],
+  location: 'Clínica Santa María, Caracas',
+  price: 50,
+  availability: [
+    { day: 'Lunes', hours: '9:00 AM - 5:00 PM' },
+    { day: 'Martes', hours: '9:00 AM - 5:00 PM' },
+    { day: 'Miércoles', hours: '9:00 AM - 5:00 PM' },
+    { day: 'Jueves', hours: '9:00 AM - 5:00 PM' },
+    { day: 'Viernes', hours: '9:00 AM - 3:00 PM' },
+  ]
+};
 
-const ProviderDetailScreen = ({ route, navigation }) => {
-  const { provider } = route.params;
-  const [selectedDate, setSelectedDate] = useState(null);
+const ProviderDetailScreen = ({ navigation }) => {
+  const [selectedDay, setSelectedDay] = useState(null);
 
-  const handleStartBooking = () => {
-    navigation.navigate('BookAppointment', { provider });
+  const handleBookAppointment = () => {
+    navigation.navigate('BookAppointment', { doctorId: DOCTOR_DATA.id });
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
-        {/* Información Principal */}
-        <Card>
-          <Card.Title style={styles.name}>{provider.name}</Card.Title>
-          <Card.Divider />
-          <View style={styles.mainInfo}>
-            <Text style={styles.specialty}>{provider.specialty}</Text>
+      <ScrollView 
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <LinearGradient
+          colors={[COLORS.primaryLight, COLORS.background]}
+          style={styles.headerGradient}
+        >
+          <View style={styles.profileHeader}>
+            <Avatar
+              size={100}
+              rounded
+              title={DOCTOR_DATA.name.charAt(0)}
+              containerStyle={styles.avatar}
+              overlayContainerStyle={{ backgroundColor: COLORS.primary }}
+            />
+            <Text style={styles.doctorName}>{DOCTOR_DATA.name}</Text>
+            <Text style={styles.specialty}>{DOCTOR_DATA.specialty}</Text>
             <View style={styles.ratingContainer}>
               <Rating
                 readonly
-                startingValue={provider.rating}
-                imageSize={16}
+                startingValue={DOCTOR_DATA.rating}
+                imageSize={20}
                 style={styles.rating}
               />
-              <TouchableOpacity 
-                onPress={() => navigation.navigate('Reviews', { provider })}
-                style={styles.reviewsLink}
-              >
-                <Text style={styles.reviewCount}>({provider.reviewCount} reseñas)</Text>
-              </TouchableOpacity>
+              <Text style={styles.reviews}>
+                {DOCTOR_DATA.rating} ({DOCTOR_DATA.reviews} reseñas)
+              </Text>
             </View>
-            <Text style={styles.address}>{provider.address}</Text>
           </View>
-          <Text style={styles.description}>{provider.description}</Text>
-        </Card>
+        </LinearGradient>
 
-        {/* Horarios */}
-        <Card>
-          <Card.Title>Horarios de Atención</Card.Title>
-          <Card.Divider />
-          {MOCK_SCHEDULE.map((schedule) => (
-            <ListItem key={schedule.id}>
-              <ListItem.Content>
-                <ListItem.Title>{schedule.day}</ListItem.Title>
-                <ListItem.Subtitle>{schedule.hours}</ListItem.Subtitle>
-              </ListItem.Content>
-            </ListItem>
-          ))}
-        </Card>
+        <View style={styles.infoSection}>
+          <View style={styles.infoCard}>
+            <View style={styles.infoRow}>
+              <Icon
+                name="briefcase-outline"
+                type="material-community"
+                size={24}
+                color={COLORS.primary}
+              />
+              <View style={styles.infoTextContainer}>
+                <Text style={styles.infoLabel}>Experiencia</Text>
+                <Text style={styles.infoValue}>{DOCTOR_DATA.experience}</Text>
+              </View>
+            </View>
 
-        {/* Servicios */}
-        <Card>
-          <Card.Title>Servicios</Card.Title>
-          <Card.Divider />
-          {MOCK_SERVICES.map((service) => (
-            <ListItem key={service.id}>
-              <ListItem.Content>
-                <ListItem.Title>{service.name}</ListItem.Title>
-                <ListItem.Subtitle>{service.price}</ListItem.Subtitle>
-              </ListItem.Content>
-            </ListItem>
-          ))}
-        </Card>
+            <Divider style={styles.divider} />
 
-        {/* Botón de Reserva */}
-        <View style={styles.bookingContainer}>
-          <Button
-            title="Reservar Cita"
-            onPress={handleStartBooking}
-            buttonStyle={styles.bookingButton}
-          />
+            <View style={styles.infoRow}>
+              <Icon
+                name="school-outline"
+                type="material-community"
+                size={24}
+                color={COLORS.primary}
+              />
+              <View style={styles.infoTextContainer}>
+                <Text style={styles.infoLabel}>Educación</Text>
+                <Text style={styles.infoValue}>{DOCTOR_DATA.education}</Text>
+              </View>
+            </View>
+
+            <Divider style={styles.divider} />
+
+            <View style={styles.infoRow}>
+              <Icon
+                name="translate"
+                type="material-community"
+                size={24}
+                color={COLORS.primary}
+              />
+              <View style={styles.infoTextContainer}>
+                <Text style={styles.infoLabel}>Idiomas</Text>
+                <Text style={styles.infoValue}>{DOCTOR_DATA.languages.join(', ')}</Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.descriptionCard}>
+            <Text style={styles.sectionTitle}>Acerca del Doctor</Text>
+            <Text style={styles.description}>{DOCTOR_DATA.description}</Text>
+          </View>
+
+          <View style={styles.locationCard}>
+            <Text style={styles.sectionTitle}>Ubicación</Text>
+            <View style={styles.locationRow}>
+              <Icon
+                name="map-marker-outline"
+                type="material-community"
+                size={24}
+                color={COLORS.primary}
+              />
+              <Text style={styles.locationText}>{DOCTOR_DATA.location}</Text>
+            </View>
+          </View>
+
+          <View style={styles.availabilityCard}>
+            <Text style={styles.sectionTitle}>Disponibilidad</Text>
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false}
+              style={styles.daysScroll}
+            >
+              {DOCTOR_DATA.availability.map((slot, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.dayCard,
+                    selectedDay === index && styles.selectedDayCard
+                  ]}
+                  onPress={() => setSelectedDay(index)}
+                >
+                  <Text style={[
+                    styles.dayText,
+                    selectedDay === index && styles.selectedDayText
+                  ]}>
+                    {slot.day}
+                  </Text>
+                  <Text style={[
+                    styles.hoursText,
+                    selectedDay === index && styles.selectedHoursText
+                  ]}>
+                    {slot.hours}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
         </View>
       </ScrollView>
+
+      <View style={styles.footer}>
+        <View style={styles.priceContainer}>
+          <Text style={styles.priceLabel}>Consulta desde</Text>
+          <Text style={styles.price}>${DOCTOR_DATA.price}</Text>
+        </View>
+        <Button
+          title="Agendar Cita"
+          onPress={handleBookAppointment}
+          buttonStyle={styles.bookButton}
+          titleStyle={styles.bookButtonText}
+          icon={{
+            name: 'calendar-check',
+            type: 'material-community',
+            size: 20,
+            color: COLORS.white
+          }}
+          iconRight
+        />
+      </View>
     </SafeAreaView>
   );
 };
@@ -97,53 +206,215 @@ const ProviderDetailScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: COLORS.background,
   },
-  name: {
+  content: {
+    flex: 1,
+  },
+  headerGradient: {
+    paddingVertical: SPACING * 4,
+  },
+  profileHeader: {
+    alignItems: 'center',
+  },
+  avatar: {
+    marginBottom: SPACING * 2,
+  },
+  doctorName: {
     fontSize: 24,
     fontWeight: 'bold',
-  },
-  mainInfo: {
-    marginBottom: 15,
+    color: COLORS.primary,
+    marginBottom: SPACING,
   },
   specialty: {
-    fontSize: 18,
-    color: '#666',
-    marginBottom: 5,
+    fontSize: 16,
+    color: COLORS.grey,
+    marginBottom: SPACING * 2,
   },
   ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 5,
-    flexWrap: 'wrap',
   },
   rating: {
-    padding: 0,
+    marginRight: SPACING,
   },
-  reviewCount: {
-    marginLeft: 8,
-    color: '#666',
-    fontSize: 12,
+  reviews: {
+    fontSize: 14,
+    color: COLORS.grey,
   },
-  address: {
-    color: '#666',
-    marginTop: 5,
+  infoSection: {
+    padding: SPACING * 2,
+  },
+  infoCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: SPACING * 2,
+    padding: SPACING * 2,
+    marginBottom: SPACING * 2,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: SPACING,
+  },
+  infoTextContainer: {
+    marginLeft: SPACING * 2,
+    flex: 1,
+  },
+  infoLabel: {
+    fontSize: 14,
+    color: COLORS.grey,
+    marginBottom: SPACING / 2,
+  },
+  infoValue: {
+    fontSize: 16,
+    color: '#333',
+  },
+  divider: {
+    marginVertical: SPACING,
+  },
+  descriptionCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: SPACING * 2,
+    padding: SPACING * 2,
+    marginBottom: SPACING * 2,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: SPACING * 2,
   },
   description: {
+    fontSize: 14,
+    color: COLORS.grey,
+    lineHeight: 22,
+  },
+  locationCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: SPACING * 2,
+    padding: SPACING * 2,
+    marginBottom: SPACING * 2,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+  },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  locationText: {
+    fontSize: 14,
+    color: COLORS.grey,
+    marginLeft: SPACING,
+    flex: 1,
+  },
+  availabilityCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: SPACING * 2,
+    padding: SPACING * 2,
+    marginBottom: SPACING * 2,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+  },
+  daysScroll: {
+    flexGrow: 0,
+  },
+  dayCard: {
+    backgroundColor: COLORS.background,
+    borderRadius: SPACING,
+    padding: SPACING * 2,
+    marginRight: SPACING,
+    minWidth: 120,
+    alignItems: 'center',
+  },
+  selectedDayCard: {
+    backgroundColor: COLORS.primary,
+  },
+  dayText: {
     fontSize: 16,
-    lineHeight: 24,
-    color: '#444',
+    fontWeight: '600',
+    color: COLORS.primary,
+    marginBottom: SPACING,
   },
-  bookingContainer: {
-    padding: 20,
+  selectedDayText: {
+    color: COLORS.white,
   },
-  bookingButton: {
-    backgroundColor: '#0077B6',
-    borderRadius: 10,
-    paddingVertical: 12,
+  hoursText: {
+    fontSize: 14,
+    color: COLORS.grey,
   },
-  reviewsLink: {
-    marginLeft: 8,
+  selectedHoursText: {
+    color: COLORS.white,
+  },
+  footer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: SPACING * 2,
+    backgroundColor: COLORS.white,
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
+  },
+  priceContainer: {
+    flex: 1,
+  },
+  priceLabel: {
+    fontSize: 12,
+    color: COLORS.grey,
+  },
+  price: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+  },
+  bookButton: {
+    backgroundColor: COLORS.primary,
+    borderRadius: SPACING * 3,
+    paddingVertical: SPACING * 1.5,
+    paddingHorizontal: SPACING * 3,
+  },
+  bookButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginRight: SPACING,
   },
 });
 
