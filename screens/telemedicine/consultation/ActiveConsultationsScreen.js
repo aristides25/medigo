@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTelemedicine } from '../../../context/TelemedicineContext';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import BottomNavbar from '../../../components/BottomNavbar';
 
 const ActiveConsultationsScreen = ({ navigation }) => {
   const { activeConsultations } = useTelemedicine();
@@ -81,7 +83,7 @@ const ActiveConsultationsScreen = ({ navigation }) => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Mis Consultas</Text>
         <TouchableOpacity
@@ -93,25 +95,29 @@ const ActiveConsultationsScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {activeConsultations.length === 0 ? (
-        <View style={styles.emptyState}>
-          <MaterialIcons name="medical-services" size={64} color="#ccc" />
-          <Text style={styles.emptyStateText}>
-            No tienes consultas programadas
-          </Text>
-          <Text style={styles.emptyStateSubtext}>
-            Programa una consulta con nuestros especialistas
-          </Text>
-        </View>
-      ) : (
-        activeConsultations.map((consultation) => (
-          <ConsultationCard
-            key={consultation.id}
-            consultation={consultation}
-          />
-        ))
-      )}
-    </ScrollView>
+      <ScrollView style={[styles.content, { marginBottom: 70 }]}>
+        {activeConsultations.length === 0 ? (
+          <View style={styles.emptyState}>
+            <MaterialIcons name="medical-services" size={64} color="#ccc" />
+            <Text style={styles.emptyStateText}>
+              No tienes consultas programadas
+            </Text>
+            <Text style={styles.emptyStateSubtext}>
+              Programa una consulta con nuestros especialistas
+            </Text>
+          </View>
+        ) : (
+          activeConsultations.map((consultation) => (
+            <ConsultationCard
+              key={consultation.id}
+              consultation={consultation}
+            />
+          ))
+        )}
+      </ScrollView>
+
+      <BottomNavbar />
+    </SafeAreaView>
   );
 };
 

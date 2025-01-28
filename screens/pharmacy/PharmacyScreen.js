@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, FlatList, Alert, ScrollView } from 'react-native';
-import { Text, SearchBar, Icon, Badge, Avatar } from '@rneui/themed';
+import { Text, SearchBar, Icon, Badge, Avatar, Button } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCart } from '../../context/CartContext';
+import BottomNavbar from '../../components/BottomNavbar';
 
 const PHARMACIES = [
   {
@@ -224,70 +225,74 @@ const PharmacyScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.fixedHeader}>
-        <View style={styles.headerContainer}>
-          <TouchableOpacity 
-            onPress={() => navigation.goBack()} 
-            style={styles.backButton}
-          >
-            <Icon name="arrow-left" type="material-community" size={24} color="#000" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Farmacias</Text>
-        </View>
-
-        <View style={styles.searchSection}>
-          <View style={styles.searchBarContainer}>
-            <Icon
-              name="magnify"
-              type="material-community"
-              size={24}
-              color="#666"
-              style={styles.searchIcon}
-            />
-            <SearchBar
-              placeholder="Buscar farmacias..."
-              onChangeText={handleSearch}
-              value={search}
-              containerStyle={styles.searchContainer}
-              inputContainerStyle={styles.searchInputContainer}
-              inputStyle={styles.searchInput}
-              platform="default"
-              searchIcon={null}
-              clearIcon={{ size: 20 }}
-            />
+      <ScrollView style={[styles.content, { marginBottom: 70 }]}>
+        <View style={styles.fixedHeader}>
+          <View style={styles.headerContainer}>
+            <TouchableOpacity 
+              onPress={() => navigation.goBack()} 
+              style={styles.backButton}
+            >
+              <Icon name="arrow-left" type="material-community" size={24} color="#000" />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Farmacias</Text>
           </View>
 
-          <FlatList
-            data={filters}
-            renderItem={renderFilterItem}
-            keyExtractor={item => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.filtersList}
-          />
+          <View style={styles.searchSection}>
+            <View style={styles.searchBarContainer}>
+              <Icon
+                name="magnify"
+                type="material-community"
+                size={24}
+                color="#666"
+                style={styles.searchIcon}
+              />
+              <SearchBar
+                placeholder="Buscar farmacias..."
+                onChangeText={handleSearch}
+                value={search}
+                containerStyle={styles.searchContainer}
+                inputContainerStyle={styles.searchInputContainer}
+                inputStyle={styles.searchInput}
+                platform="default"
+                searchIcon={null}
+                clearIcon={{ size: 20 }}
+              />
+            </View>
+
+            <FlatList
+              data={filters}
+              renderItem={renderFilterItem}
+              keyExtractor={item => item.id}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.filtersList}
+            />
+          </View>
         </View>
-      </View>
 
-      <FlatList
-        data={filteredPharmacies}
-        renderItem={renderPharmacyCard}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.pharmaciesList}
-        showsVerticalScrollIndicator={false}
-        style={styles.pharmaciesListContainer}
-      />
+        <FlatList
+          data={filteredPharmacies}
+          renderItem={renderPharmacyCard}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.pharmaciesList}
+          showsVerticalScrollIndicator={false}
+          style={styles.pharmaciesListContainer}
+        />
 
-      {cartItems && cartItems.length > 0 && (
-        <TouchableOpacity 
-          style={styles.cartButton}
-          onPress={() => navigation.navigate('Cart')}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.cartItemCount}>{cartItems.length} producto{cartItems.length > 1 ? 's' : ''}</Text>
-          <Text style={styles.cartTotal}>$ {calculateTotal(cartItems)}</Text>
-          <Text style={styles.viewCartText}>Ver mi carrito</Text>
-        </TouchableOpacity>
-      )}
+        {cartItems && cartItems.length > 0 && (
+          <TouchableOpacity 
+            style={styles.cartButton}
+            onPress={() => navigation.navigate('Cart')}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.cartItemCount}>{cartItems.length} producto{cartItems.length > 1 ? 's' : ''}</Text>
+            <Text style={styles.cartTotal}>$ {calculateTotal(cartItems)}</Text>
+            <Text style={styles.viewCartText}>Ver mi carrito</Text>
+          </TouchableOpacity>
+        )}
+      </ScrollView>
+
+      <BottomNavbar />
     </SafeAreaView>
   );
 };

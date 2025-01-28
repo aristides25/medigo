@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { Button, Card, Text, Icon } from '@rneui/themed';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import BottomNavbar from '../../components/BottomNavbar';
 
 const emergencyTypes = [
   {
@@ -53,34 +55,38 @@ const EmergencyTypeScreen = ({ navigation }) => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.header}>¿Qué tipo de servicio necesitas?</Text>
-      <Text style={styles.subheader}>Selecciona el motivo de la ambulancia</Text>
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={[styles.content, { marginBottom: 70 }]}>
+        <Text style={styles.header}>¿Qué tipo de servicio necesitas?</Text>
+        <Text style={styles.subheader}>Selecciona el motivo de la ambulancia</Text>
 
-      <View style={styles.cardsContainer}>
-        {emergencyTypes.map((type) => (
-          <Card key={type.id} containerStyle={styles.card}>
-            <View style={styles.cardContent}>
-              <Icon
-                name={type.icon}
-                type="font-awesome"
-                size={30}
-                color={type.color}
-                containerStyle={styles.iconContainer}
-              />
-              <Card.Title style={styles.cardTitle}>{type.title}</Card.Title>
-              <Text style={styles.cardDescription}>{type.description}</Text>
-              <Button
-                title="Seleccionar"
-                onPress={() => handleSelectType(type)}
-                buttonStyle={[styles.button, { backgroundColor: type.color }]}
-                titleStyle={styles.buttonText}
-              />
-            </View>
-          </Card>
-        ))}
-      </View>
-    </ScrollView>
+        <View style={styles.cardsContainer}>
+          {emergencyTypes.map((type) => (
+            <Card key={type.id} containerStyle={styles.card}>
+              <View style={styles.cardContent}>
+                <Icon
+                  name={type.icon}
+                  type="font-awesome"
+                  size={30}
+                  color={type.color}
+                  containerStyle={styles.iconContainer}
+                />
+                <Card.Title style={styles.cardTitle}>{type.title}</Card.Title>
+                <Text style={styles.cardDescription}>{type.description}</Text>
+                <Button
+                  title="Seleccionar"
+                  onPress={() => handleSelectType(type)}
+                  buttonStyle={[styles.button, { backgroundColor: type.color }]}
+                  titleStyle={styles.buttonText}
+                />
+              </View>
+            </Card>
+          ))}
+        </View>
+      </ScrollView>
+
+      <BottomNavbar />
+    </SafeAreaView>
   );
 };
 

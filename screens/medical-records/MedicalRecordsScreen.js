@@ -3,6 +3,7 @@ import { View, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } fro
 import { Text, Card, Button, Icon, Divider } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useMedicalRecord } from '../../context/MedicalRecordContext';
+import BottomNavbar from '../../components/BottomNavbar';
 
 const MedicalRecordsScreen = ({ navigation }) => {
   const { appointments, documents, prescriptions, loading } = useMedicalRecord();
@@ -72,7 +73,7 @@ const MedicalRecordsScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
+      <ScrollView style={[styles.content, { marginBottom: 70 }]}>
         {/* Resumen del Expediente */}
         <Card containerStyle={styles.summaryCard}>
           <View style={styles.summaryHeader}>
@@ -154,6 +155,8 @@ const MedicalRecordsScreen = ({ navigation }) => {
           ))}
         </View>
       </ScrollView>
+
+      <BottomNavbar />
     </SafeAreaView>
   );
 };

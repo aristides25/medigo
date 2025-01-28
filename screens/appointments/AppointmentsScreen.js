@@ -3,6 +3,7 @@ import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Button, Card, Icon, Badge, ButtonGroup } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAppointment } from '../../context/AppointmentContext';
+import BottomNavbar from '../../components/BottomNavbar';
 
 const AppointmentCard = ({ appointment, onPress }) => {
   const getStatusColor = (status) => {
@@ -128,7 +129,7 @@ const AppointmentsScreen = ({ navigation }) => {
         selectedTextStyle={styles.selectedButtonText}
       />
 
-      <ScrollView style={styles.content}>
+      <ScrollView style={[styles.content, { marginBottom: 70 }]}>
         {filteredAppointments.length === 0 ? (
           <View style={styles.emptyState}>
             <Icon
@@ -165,6 +166,8 @@ const AppointmentsScreen = ({ navigation }) => {
           iconRight
         />
       </View>
+
+      <BottomNavbar />
     </SafeAreaView>
   );
 };
@@ -260,7 +263,7 @@ const styles = StyleSheet.create({
   },
   floatingButtonContainer: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 90,
     right: 20,
     left: 20,
   },

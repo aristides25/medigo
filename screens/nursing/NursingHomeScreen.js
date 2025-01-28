@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { Text, Card, Button, Icon } from '@rneui/themed';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import BottomNavbar from '../../components/BottomNavbar';
 
 const nursingServices = [
   {
@@ -39,38 +41,42 @@ const NursingHomeScreen = ({ navigation }) => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text h4 style={styles.headerText}>Servicios Disponibles</Text>
-        <Text style={styles.subheader}>Selecciona el servicio que necesitas</Text>
-      </View>
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={[styles.content, { marginBottom: 70 }]}>
+        <View style={styles.header}>
+          <Text h4 style={styles.headerText}>Servicios Disponibles</Text>
+          <Text style={styles.subheader}>Selecciona el servicio que necesitas</Text>
+        </View>
 
-      {nursingServices.map((service) => (
-        <Card key={service.id} containerStyle={styles.card}>
-          <View style={styles.cardHeader}>
-            <Icon
-              name={service.icon}
-              type="material-community"
-              color="#0077CC"
-              size={30}
+        {nursingServices.map((service) => (
+          <Card key={service.id} containerStyle={styles.card}>
+            <View style={styles.cardHeader}>
+              <Icon
+                name={service.icon}
+                type="material-community"
+                color="#0077CC"
+                size={30}
+              />
+              <Text h4 style={styles.serviceTitle}>{service.title}</Text>
+            </View>
+            
+            <Text style={styles.description}>{service.description}</Text>
+            
+            <View style={styles.priceContainer}>
+              <Text style={styles.price}>Desde ${service.price}/hora</Text>
+            </View>
+
+            <Button
+              title="Ver Detalles"
+              onPress={() => handleServicePress(service)}
+              buttonStyle={styles.button}
             />
-            <Text h4 style={styles.serviceTitle}>{service.title}</Text>
-          </View>
-          
-          <Text style={styles.description}>{service.description}</Text>
-          
-          <View style={styles.priceContainer}>
-            <Text style={styles.price}>Desde ${service.price}/hora</Text>
-          </View>
+          </Card>
+        ))}
+      </ScrollView>
 
-          <Button
-            title="Ver Detalles"
-            onPress={() => handleServicePress(service)}
-            buttonStyle={styles.button}
-          />
-        </Card>
-      ))}
-    </ScrollView>
+      <BottomNavbar />
+    </SafeAreaView>
   );
 };
 

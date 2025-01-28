@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet, Dimensions, TouchableOpacity, Modal } from 'react-native';
 import { Button, Text, Icon, Overlay } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import BottomNavbar from '../components/BottomNavbar';
 
 const modules = [
   {
@@ -81,7 +82,7 @@ const HomeScreen = ({ navigation }) => {
         <Text style={styles.subtitle}>Tu salud, nuestra prioridad</Text>
       </View>
 
-      <View style={styles.modulesContainer}>
+      <View style={[styles.modulesContainer, { marginBottom: 70 }]}>
         <View style={styles.moduleRow}>
           {modules.map((module, index) => (
             <View key={index} style={styles.moduleCard}>
@@ -130,6 +131,8 @@ const HomeScreen = ({ navigation }) => {
           ))}
         </View>
       </View>
+
+      <BottomNavbar />
     </SafeAreaView>
   );
 };
