@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, Alert } from 'react-native';
+import { View, ScrollView, StyleSheet, Alert, Image } from 'react-native';
 import { Text, Card, Button, Icon, Divider } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCart } from '../../context/CartContext';
@@ -78,47 +78,33 @@ const PharmacyAvailabilityCard = ({
 );
 
 const ProductDetailScreen = ({ route, navigation }) => {
-  const { product } = route.params;
+  const { product, preselectedPharmacy, pharmacyAvailability } = route.params;
   const { addToCart } = useCart();
   const { selectedPharmacy, selectPharmacy } = usePharmacy();
-  const [selectedAvailability, setSelectedAvailability] = useState(null);
 
   useEffect(() => {
-    // Reset selected pharmacy when entering the screen
-    selectPharmacy(null);
-  }, []);
-
-  const handleSelectPharmacy = (pharmacyId) => {
-    selectPharmacy(pharmacyId);
-    if (product.availability) {
-      const availability = product.availability.find(
-        a => a.pharmacyId === pharmacyId
-      );
-      setSelectedAvailability(availability);
+    // Si hay una farmacia preseleccionada, usarla
+    if (preselectedPharmacy) {
+      selectPharmacy(preselectedPharmacy.id);
     }
-  };
+  }, [preselectedPharmacy]);
 
   const handleAddToCart = () => {
-    if (product.availability && !selectedPharmacy) {
-      Alert.alert('Error', 'Por favor, selecciona una farmacia primero');
-      return;
-    }
-
     if (product.requiresPrescription) {
       navigation.navigate('UploadPrescription', {
         fromProduct: true,
-        product: product.availability ? {
+        product: {
           ...product,
-          price: selectedAvailability.price,
-          pharmacyId: selectedPharmacy.id
-        } : product
+          price: pharmacyAvailability.price,
+          pharmacyId: preselectedPharmacy.id
+        }
       });
     } else {
-      addToCart(product.availability ? {
+      addToCart({
         ...product,
-        price: selectedAvailability.price,
-        pharmacyId: selectedPharmacy.id
-      } : product);
+        price: pharmacyAvailability.price,
+        pharmacyId: preselectedPharmacy.id
+      });
       Alert.alert(
         'Éxito',
         'Producto agregado al carrito',
@@ -140,6 +126,15 @@ const ProductDetailScreen = ({ route, navigation }) => {
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <Card containerStyle={styles.productCard}>
+          <Image
+            source={product.image}
+            style={styles.productImage}
+            resizeMode="contain"
+          />
+          <View style={styles.productTypeTag}>
+            <Text style={styles.productTypeText}>{product.type}</Text>
+          </View>
+          
           <Text style={styles.productName}>{product.name}</Text>
           <Text style={styles.brand}>{product.brand}</Text>
           <Text style={styles.presentation}>{product.presentation}</Text>
@@ -157,7 +152,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
           )}
 
           <Divider style={styles.divider} />
-
+          
           <Text style={styles.sectionTitle}>Detalles del producto</Text>
           <Text style={styles.description}>{product.description}</Text>
           
@@ -176,41 +171,17 @@ const ProductDetailScreen = ({ route, navigation }) => {
             )}
           </View>
 
-          {!product.availability && (
-            <View style={styles.priceContainer}>
-              <Text style={styles.priceLabel}>Precio:</Text>
-              <Text style={styles.price}>Bs. {product.price.toFixed(2)}</Text>
-            </View>
-          )}
+          <View style={styles.priceContainer}>
+            <Text style={styles.priceLabel}>Precio en {preselectedPharmacy.name}:</Text>
+            <Text style={styles.price}>Bs. {pharmacyAvailability.price.toFixed(2)}</Text>
+          </View>
         </Card>
-
-        {product.availability && (
-          <>
-            <Text style={styles.availabilityTitle}>Disponibilidad en farmacias</Text>
-            
-            {product.availability.map((availability) => {
-              const pharmacy = AFFILIATED_PHARMACIES.find(
-                p => p.id === availability.pharmacyId
-              );
-              return (
-                <PharmacyAvailabilityCard
-                  key={pharmacy.id}
-                  availability={availability}
-                  pharmacy={pharmacy}
-                  onSelectPharmacy={handleSelectPharmacy}
-                  isSelected={selectedPharmacy?.id === pharmacy.id}
-                />
-              );
-            })}
-          </>
-        )}
       </ScrollView>
 
       <Card containerStyle={styles.bottomCard}>
         <Button
           title={product.requiresPrescription ? "Continuar con receta" : "Agregar al carrito"}
           onPress={handleAddToCart}
-          disabled={product.availability && !selectedPharmacy}
           buttonStyle={styles.addButton}
           icon={
             <Icon
@@ -236,6 +207,27 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 15,
     padding: 15,
+  },
+  productImage: {
+    width: '100%',
+    height: 200,
+    marginBottom: 16,
+    borderRadius: 8,
+    backgroundColor: '#f5f5f5',
+  },
+  productTypeTag: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    backgroundColor: '#2A5C82',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  productTypeText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '600',
   },
   productName: {
     fontSize: 20,

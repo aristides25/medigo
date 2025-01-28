@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import { Text, Button, Card, Icon, Badge, FAB, ButtonGroup } from '@rneui/themed';
+import { Text, Button, Card, Icon, Badge, ButtonGroup } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAppointment } from '../../context/AppointmentContext';
 
@@ -154,13 +154,6 @@ const AppointmentsScreen = ({ navigation }) => {
           ))
         )}
       </ScrollView>
-
-      <FAB
-        icon={{ name: 'add', color: 'white' }}
-        color="#0077B6"
-        placement="right"
-        onPress={handleNewAppointment}
-      />
     </SafeAreaView>
   );
 };

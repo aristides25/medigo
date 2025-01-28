@@ -7,21 +7,6 @@ import NursingTrackingScreen from '../screens/nursing/NursingTrackingScreen';
 
 const Stack = createNativeStackNavigator();
 
-const commonHeaderOptions = {
-  headerStyle: {
-    backgroundColor: '#0077CC',
-  },
-  headerTintColor: '#fff',
-  headerTitleStyle: {
-    fontWeight: 'bold',
-  },
-  headerBackTitle: 'MediGo',
-  headerBackTitleStyle: {
-    fontFamily: 'System',
-    fontSize: 14,
-  },
-};
-
 const NursingNavigator = () => {
   return (
     <Stack.Navigator>
@@ -29,32 +14,76 @@ const NursingNavigator = () => {
         name="NursingHome" 
         component={NursingHomeScreen}
         options={{
-          ...commonHeaderOptions,
           title: 'Servicios de Enfermería',
+          headerStyle: {
+            backgroundColor: '#0077CC',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+          headerBackTitle: 'MediGo',
+          headerBackTitleStyle: {
+            fontFamily: 'System',
+            fontSize: 14,
+          },
         }}
       />
       <Stack.Screen 
         name="NursingServiceDetail" 
         component={NursingServiceDetailScreen}
         options={{
-          ...commonHeaderOptions,
           title: 'Detalle del Servicio',
+          headerStyle: {
+            backgroundColor: '#0077CC',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+          headerBackTitle: 'MediGo',
+          headerBackTitleStyle: {
+            fontFamily: 'System',
+            fontSize: 14,
+          },
         }}
       />
       <Stack.Screen 
         name="NursingBooking" 
         component={NursingBookingScreen}
         options={{
-          ...commonHeaderOptions,
           title: 'Reservar Servicio',
+          headerStyle: {
+            backgroundColor: '#0077CC',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+          headerBackTitle: 'MediGo',
+          headerBackTitleStyle: {
+            fontFamily: 'System',
+            fontSize: 14,
+          },
         }}
       />
       <Stack.Screen 
         name="NursingTracking" 
         component={NursingTrackingScreen}
         options={{
-          ...commonHeaderOptions,
           title: 'Seguimiento del Servicio',
+          headerStyle: {
+            backgroundColor: '#0077CC',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+          headerBackTitle: 'MediGo',
+          headerBackTitleStyle: {
+            fontFamily: 'System',
+            fontSize: 14,
+          },
         }}
       />
     </Stack.Navigator>

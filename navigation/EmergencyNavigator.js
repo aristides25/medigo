@@ -7,21 +7,6 @@ import EmergencyTrackingScreen from '../screens/emergency/EmergencyTrackingScree
 
 const Stack = createNativeStackNavigator();
 
-const commonHeaderOptions = {
-  headerStyle: {
-    backgroundColor: '#0077CC',
-  },
-  headerTintColor: '#fff',
-  headerTitleStyle: {
-    fontWeight: 'bold',
-  },
-  headerBackTitle: 'MediGo',
-  headerBackTitleStyle: {
-    fontFamily: 'System',
-    fontSize: 14,
-  },
-};
-
 const EmergencyNavigator = () => {
   return (
     <Stack.Navigator>
@@ -29,16 +14,38 @@ const EmergencyNavigator = () => {
         name="EmergencyMap" 
         component={EmergencyMapScreen}
         options={{
-          ...commonHeaderOptions,
           title: 'Emergencias',
+          headerStyle: {
+            backgroundColor: '#0077CC',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+          headerBackTitle: 'MediGo',
+          headerBackTitleStyle: {
+            fontFamily: 'System',
+            fontSize: 14,
+          },
         }}
       />
       <Stack.Screen 
         name="EmergencyTracking" 
         component={EmergencyTrackingScreen}
         options={{
-          ...commonHeaderOptions,
           title: 'Seguimiento de Ambulancia',
+          headerStyle: {
+            backgroundColor: '#0077CC',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+          headerBackTitle: 'MediGo',
+          headerBackTitleStyle: {
+            fontFamily: 'System',
+            fontSize: 14,
+          },
         }}
       />
     </Stack.Navigator>

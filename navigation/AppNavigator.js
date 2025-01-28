@@ -195,16 +195,14 @@ const AppNavigator = () => {
         name="Emergency"
         component={EmergencyNavigator}
         options={{ 
-          title: 'Emergencias',
-          headerShown: false 
+          headerShown: false
         }}
       />
       <Stack.Screen
         name="Nursing"
         component={NursingNavigator}
         options={{ 
-          title: 'Servicios de Enfermería',
-          headerShown: false 
+          headerShown: false
         }}
       />
     </Stack.Navigator>

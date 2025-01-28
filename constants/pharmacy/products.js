@@ -3,6 +3,8 @@ export const PRODUCTS = [
     id: '1',
     name: 'Paracetamol 500mg',
     category: 'Medicamentos',
+    type: 'Tabletas',
+    image: require('../../assets/paracetamol.png'),
     description: 'Analgésico y antipirético para alivio del dolor y fiebre',
     requiresPrescription: false,
     brand: 'MediGo Generic',
@@ -34,6 +36,8 @@ export const PRODUCTS = [
     id: '2',
     name: 'Ibuprofeno 400mg',
     category: 'Medicamentos',
+    type: 'Tabletas',
+    image: require('../../assets/ibuprofeno.png'),
     description: 'Antiinflamatorio no esteroideo (AINE)',
     requiresPrescription: false,
     brand: 'MediGo Generic',
@@ -65,10 +69,12 @@ export const PRODUCTS = [
     id: '3',
     name: 'Amoxicilina 500mg',
     category: 'Medicamentos',
+    type: 'Cápsulas',
+    image: require('../../assets/amoxicilina.png'),
     description: 'Antibiótico de amplio espectro',
     requiresPrescription: true,
     brand: 'MediGo Generic',
-    presentation: 'Caja x 21 tabletas',
+    presentation: 'Caja x 21 cápsulas',
     activeIngredient: 'Amoxicilina',
     administration: 'Oral',
     availability: [
@@ -96,38 +102,61 @@ export const PRODUCTS = [
     id: '4',
     name: 'Crema Hidratante Facial',
     category: 'Dermocosméticos',
+    type: 'Crema Tópica',
+    image: require('../../assets/crema.png'),
     description: 'Crema hidratante para todo tipo de piel',
-    price: 15.99,
-    stock: 50,
-    image: 'https://example.com/crema.jpg',
     requiresPrescription: false,
     brand: 'DermaCare',
     presentation: 'Frasco 50ml',
+    availability: [
+      {
+        pharmacyId: 'ph1',
+        price: 15.99,
+        stock: 50,
+        canPartialDeliver: true
+      }
+    ]
   },
   {
     id: '5',
     name: 'Vitamina C 1000mg',
     category: 'Vitaminas',
+    type: 'Tabletas Efervescentes',
+    image: require('../../assets/vitamina-c.png'),
     description: 'Suplemento de vitamina C para reforzar el sistema inmune',
-    price: 12.99,
-    stock: 60,
-    image: 'https://example.com/vitaminac.jpg',
     requiresPrescription: false,
     brand: 'VitaHealth',
     presentation: 'Frasco x 60 tabletas',
+    availability: [
+      {
+        pharmacyId: 'ph1',
+        price: 12.99,
+        stock: 60,
+        canPartialDeliver: true
+      }
+    ]
   },
   {
     id: '6',
-    name: 'Jabón Antibacterial',
-    category: 'Cuidado Personal',
-    description: 'Jabón líquido antibacterial para manos',
-    price: 4.99,
-    stock: 120,
-    image: 'https://example.com/jabon.jpg',
+    name: 'Jarabe para la Tos',
+    category: 'Medicamentos',
+    type: 'Jarabe',
+    image: require('../../assets/jarabe.png'),
+    description: 'Jarabe expectorante y antitusivo',
     requiresPrescription: false,
-    brand: 'CleanCare',
-    presentation: 'Botella 250ml',
-  },
+    brand: 'MediGo Generic',
+    presentation: 'Frasco 120ml',
+    activeIngredient: 'Ambroxol / Dextrometorfano',
+    administration: 'Oral',
+    availability: [
+      {
+        pharmacyId: 'ph1',
+        price: 8.99,
+        stock: 40,
+        canPartialDeliver: true
+      }
+    ]
+  }
 ];
 
 export const CATEGORIES = [
@@ -135,24 +164,24 @@ export const CATEGORIES = [
     id: 1,
     name: 'Medicamentos',
     icon: 'pill',
-    count: 1500,
+    count: 1500
   },
   {
     id: 2,
     name: 'Dermocosméticos',
-    icon: 'lotion',
-    count: 300,
+    icon: 'face-woman',
+    count: 300
   },
   {
     id: 3,
     name: 'Cuidado Personal',
     icon: 'hand-heart',
-    count: 450,
+    count: 450
   },
   {
     id: 4,
     name: 'Vitaminas',
-    icon: 'vitamin',
-    count: 200,
-  },
+    icon: 'food-apple',
+    count: 200
+  }
 ]; 
