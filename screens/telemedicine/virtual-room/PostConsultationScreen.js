@@ -59,7 +59,7 @@ const PostConsultationScreen = ({ route, navigation }) => {
 
       <TouchableOpacity 
         style={styles.button}
-        onPress={() => navigation.navigate('ActiveConsultations')}
+        onPress={() => navigation.navigate('TelemedicineHome')}
       >
         <Text style={styles.buttonText}>Volver a Mis Consultas</Text>
       </TouchableOpacity>

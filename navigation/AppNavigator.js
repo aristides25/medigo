@@ -288,17 +288,17 @@ const AppNavigator = () => {
           }}
         />
         <Stack.Screen
-          name="TelemedicineSchedule"
+          name="Schedule"
           component={ScheduleScreen}
           options={{
-            title: 'Programar Consulta',
+            title: 'Agendar Consulta',
           }}
         />
         <Stack.Screen
           name="TelemedicinePayment"
           component={TelemedicinePaymentScreen}
           options={{
-            title: 'Pago',
+            title: 'Pago de Consulta',
           }}
         />
         <Stack.Screen

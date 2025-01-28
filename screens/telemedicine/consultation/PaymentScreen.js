@@ -16,7 +16,23 @@ const PaymentScreen = ({ navigation }) => {
   const [cardNumber, setCardNumber] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCvv] = useState('');
-  const { currentConsultation, startConsultation } = useTelemedicine();
+  const { currentConsultation, addConsultation } = useTelemedicine();
+
+  // Validar que tenemos la información necesaria
+  if (!currentConsultation || !currentConsultation.doctor) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>Error: Información de consulta no disponible</Text>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.backButtonText}>Volver</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   const { doctor, scheduledDate, scheduledTime } = currentConsultation;
 
   const PAYMENT_METHODS = [
@@ -38,12 +54,16 @@ const PaymentScreen = ({ navigation }) => {
 
   const handlePayment = () => {
     // Aquí iría la lógica de procesamiento del pago
-    startConsultation({
+    const newConsultation = {
       ...currentConsultation,
+      id: Date.now().toString(),
+      status: 'upcoming',
       paymentStatus: 'completed',
       paymentMethod: selectedMethod,
-    });
-    navigation.navigate('ActiveConsultations');
+    };
+    
+    addConsultation(newConsultation);
+    navigation.navigate('TelemedicineHome');
   };
 
   const PaymentMethodCard = ({ method, selected }) => (
@@ -247,6 +267,25 @@ const styles = StyleSheet.create({
     backgroundColor: '#ccc',
   },
   payButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+    fontWeight: 'bold',
+    margin: 16,
+    textAlign: 'center',
+  },
+  backButton: {
+    backgroundColor: '#2196F3',
+    borderRadius: 8,
+    padding: 16,
+    margin: 16,
+    alignItems: 'center',
+  },
+  backButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',

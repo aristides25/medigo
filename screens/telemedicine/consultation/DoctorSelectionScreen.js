@@ -67,7 +67,7 @@ const DoctorSelectionScreen = ({ navigation, route }) => {
       ...currentConsultation,
       doctor,
     });
-    navigation.navigate('Schedule', { doctorId: doctor.id });
+    navigation.navigate('Schedule');
   };
 
   const DoctorCard = ({ doctor }) => (

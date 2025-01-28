@@ -32,7 +32,7 @@ const TIME_SLOTS = [
 const ScheduleScreen = ({ navigation, route }) => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
-  const { currentConsultation, addConsultation } = useTelemedicine();
+  const { currentConsultation, addConsultation, startConsultation } = useTelemedicine();
   const { doctor } = currentConsultation;
 
   // Obtener la fecha actual en formato YYYY-MM-DD
@@ -81,8 +81,8 @@ const ScheduleScreen = ({ navigation, route }) => {
         scheduledTime: `${selectedTime.time} ${selectedTime.period}`,
       };
       
-      const newConsultation = addConsultation(consultation);
-      navigation.navigate('Payment', { consultationId: newConsultation.id });
+      startConsultation(consultation);
+      navigation.navigate('TelemedicinePayment');
     }
   };
 
