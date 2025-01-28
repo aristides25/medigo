@@ -138,11 +138,6 @@ const AppointmentsScreen = ({ navigation }) => {
               color="#666"
             />
             <Text style={styles.emptyStateText}>No tienes citas {filterStatus !== 0 ? 'en este estado' : ''}</Text>
-            <Button
-              title="Agendar Nueva Cita"
-              onPress={handleNewAppointment}
-              buttonStyle={styles.newAppointmentButton}
-            />
           </View>
         ) : (
           filteredAppointments.map((appointment) => (
@@ -154,6 +149,22 @@ const AppointmentsScreen = ({ navigation }) => {
           ))
         )}
       </ScrollView>
+      
+      <View style={styles.floatingButtonContainer}>
+        <Button
+          title="Agendar Nueva Cita"
+          onPress={handleNewAppointment}
+          buttonStyle={styles.floatingButton}
+          raised
+          icon={{
+            name: 'plus',
+            type: 'font-awesome',
+            size: 15,
+            color: 'white',
+          }}
+          iconRight
+        />
+      </View>
     </SafeAreaView>
   );
 };
@@ -247,10 +258,16 @@ const styles = StyleSheet.create({
     marginVertical: 15,
     textAlign: 'center',
   },
-  newAppointmentButton: {
+  floatingButtonContainer: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    left: 20,
+  },
+  floatingButton: {
     backgroundColor: '#0077B6',
-    paddingHorizontal: 30,
     borderRadius: 25,
+    paddingVertical: 12,
   },
 });
 
