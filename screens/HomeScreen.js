@@ -8,37 +8,37 @@ const modules = [
     title: 'Citas Médicas',
     icon: 'calendar',
     description: 'Agenda tus citas médicas con profesionales de la salud',
-    route: 'Appointments'
+    route: 'appointments'
   },
   {
     title: 'Farmacia',
     icon: 'medical-bag',
     description: 'Compra medicamentos y productos farmacéuticos',
-    route: 'Pharmacy'
+    route: 'pharmacy'
   },
   {
     title: 'Expediente Médico',
     icon: 'file-document',
     description: 'Accede a tu historial médico digital',
-    route: 'MedicalRecords'
+    route: 'medical-records'
   },
   {
     title: 'Telemedicina',
     icon: 'video',
     description: 'Consultas médicas en línea',
-    route: 'TelemedicineHome'
+    route: 'telemedicine'
   },
   {
     title: 'Emergencias',
     icon: 'ambulance',
     description: 'Servicios de emergencia y ambulancia',
-    route: 'EmergencyType'
+    route: 'emergency'
   },
   {
     title: 'Servicios de Enfermería',
     icon: 'heart-pulse',
     description: 'Contrata servicios de enfermería a domicilio',
-    route: 'NursingHome'
+    route: 'nursing'
   }
 ];
 
@@ -47,6 +47,31 @@ const HomeScreen = ({ navigation }) => {
 
   const toggleTooltip = (index) => {
     setVisibleTooltip(visibleTooltip === index ? null : index);
+  };
+
+  const handleServicePress = (service) => {
+    switch (service) {
+      case 'appointments':
+        navigation.navigate('AppointmentsModule', { screen: 'AppointmentsHome' });
+        break;
+      case 'pharmacy':
+        navigation.navigate('PharmacyModule', { screen: 'PharmacyHome' });
+        break;
+      case 'medical-records':
+        navigation.navigate('MedicalRecordsModule', { screen: 'MedicalRecords' });
+        break;
+      case 'telemedicine':
+        navigation.navigate('TelemedicineModule', { screen: 'TelemedicineHome' });
+        break;
+      case 'emergency':
+        navigation.navigate('EmergencyModule', { screen: 'EmergencyType' });
+        break;
+      case 'nursing':
+        navigation.navigate('NursingModule', { screen: 'NursingHome' });
+        break;
+      default:
+        break;
+    }
   };
 
   return (
@@ -81,7 +106,7 @@ const HomeScreen = ({ navigation }) => {
               />
               <Button
                 title="Acceder"
-                onPress={() => navigation.navigate(module.route)}
+                onPress={() => handleServicePress(module.route)}
                 buttonStyle={styles.button}
                 titleStyle={styles.buttonTitle}
               />
