@@ -9,12 +9,18 @@ import EmergencyTrackingScreen from '../../screens/emergency/EmergencyTrackingSc
 const Stack = createNativeStackNavigator();
 
 const EmergencyNavigator = ({ screenOptions }) => {
+  const combinedScreenOptions = {
+    ...screenOptions,
+    animation: 'slide_from_right',
+  };
+
   return (
     <>
       <Stack.Screen 
         name="EmergencyType" 
         component={EmergencyTypeScreen}
         options={{
+          ...combinedScreenOptions,
           title: 'Servicio de Ambulancia',
         }}
       />
@@ -22,14 +28,18 @@ const EmergencyNavigator = ({ screenOptions }) => {
         name="EmergencyMap" 
         component={EmergencyMapScreen}
         options={{
+          ...combinedScreenOptions,
           title: 'Servicio de Ambulancia',
+          animation: 'slide_from_right',
         }}
       />
       <Stack.Screen 
         name="EmergencyTracking" 
         component={EmergencyTrackingScreen}
         options={{
+          ...combinedScreenOptions,
           title: 'Seguimiento',
+          animation: 'slide_from_right',
         }}
       />
     </>

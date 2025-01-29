@@ -47,12 +47,14 @@ const AppNavigator = () => {
         />
 
         {/* Module Navigators */}
-        {AppointmentsNavigator({ screenOptions })}
-        {PharmacyNavigator({ screenOptions })}
-        {MedicalRecordsNavigator({ screenOptions })}
-        {EmergencyNavigator({ screenOptions })}
-        {NursingNavigator({ screenOptions })}
-        {TelemedicineNavigator({ screenOptions })}
+        <Stack.Group>
+          {AppointmentsNavigator({ screenOptions })}
+          {PharmacyNavigator({ screenOptions })}
+          {MedicalRecordsNavigator({ screenOptions })}
+          {EmergencyNavigator({ screenOptions })}
+          {NursingNavigator({ screenOptions })}
+          {TelemedicineNavigator({ screenOptions })}
+        </Stack.Group>
       </Stack.Navigator>
     </TelemedicineProvider>
   );

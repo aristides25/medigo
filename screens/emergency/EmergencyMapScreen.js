@@ -54,6 +54,7 @@ const EmergencyMapScreen = ({ navigation, route }) => {
   const [loading, setLoading] = useState(true);
   const [followsUserLocation, setFollowsUserLocation] = useState(true);
   const [selectedService, setSelectedService] = useState(null);
+  const [mapReady, setMapReady] = useState(false);
 
   // Función para obtener la dirección de una ubicación
   const getAddressFromCoords = async (coords) => {
@@ -87,7 +88,7 @@ const EmergencyMapScreen = ({ navigation, route }) => {
   };
 
   const centerMapOnLocation = (coords, animate = true) => {
-    if (mapRef.current) {
+    if (mapRef.current && mapReady) {
       const region = {
         latitude: coords.latitude,
         longitude: coords.longitude,
@@ -301,126 +302,117 @@ const EmergencyMapScreen = ({ navigation, route }) => {
     </TouchableOpacity>
   );
 
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#e74c3c" />
-        <Text style={styles.loadingText}>Obteniendo tu ubicación...</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
-      {location && (
-        <MapView
-          ref={mapRef}
-          style={styles.map}
-          provider="google"
-          initialRegion={{
-            ...location,
-            latitudeDelta: 0.008,
-            longitudeDelta: 0.008,
-          }}
-          onPress={handleMapPress}
-          showsUserLocation={true}
-          userLocationUpdateInterval={5000}
-          showsMyLocationButton={true}
-          showsCompass={true}
-          loadingEnabled={true}
-          mapPadding={{ top: 100, right: 0, bottom: 100, left: 0 }}
-        >
-          {selectedLocation && selectedLocation !== location && (
-            <Marker
-              coordinate={selectedLocation}
-              title="Ubicación seleccionada"
-              description={selectedAddress}
-              pinColor="#e74c3c"
-            >
-              <Icon name="place" type="material" color="#e74c3c" size={40} />
-            </Marker>
-          )}
-        </MapView>
-      )}
-
-      <View style={styles.searchBarTop}>
-        <View style={styles.searchContainer}>
-          <SearchBar
-            placeholder="Buscar dirección"
-            onChangeText={handleSearch}
-            value={searchQuery}
-            containerStyle={styles.searchBarContainer}
-            inputContainerStyle={styles.searchBarInputContainer}
-            inputStyle={styles.searchBarInput}
-            searchIcon={<Icon name="place" type="material" color="#4285F4" size={20} />}
-            platform="default"
-            lightTheme
-            onClear={() => {
-              setSearchResults([]);
-              setShowResults(false);
-            }}
-          />
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#0000ff" />
+          <Text>Cargando mapa...</Text>
         </View>
-
-        {showResults && searchResults.length > 0 && (
-          <View style={styles.searchResults}>
-            <FlatList
-              data={searchResults}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={renderSearchResult}
-              style={styles.resultsList}
-            />
-          </View>
-        )}
-
-        <ScrollView horizontal style={styles.servicesContainer} showsHorizontalScrollIndicator={false}>
-          {services.map((service) => (
-            <TouchableOpacity 
-              key={service.id} 
-              style={[
-                styles.serviceCard,
-                selectedService?.id === service.id && styles.selectedServiceCard
-              ]}
-              onPress={() => handleServiceSelect(service)}
-            >
-              <Icon
-                name={service.icon}
-                type="font-awesome"
-                size={20}
-                color={selectedService?.id === service.id ? '#fff' : service.color}
-                style={styles.serviceIcon}
+      ) : (
+        <>
+          <MapView
+            ref={mapRef}
+            style={styles.map}
+            showsUserLocation
+            showsMyLocationButton={false}
+            onPress={handleMapPress}
+            onMapReady={() => setMapReady(true)}
+            initialRegion={location ? {
+              ...location,
+              latitudeDelta: 0.008,
+              longitudeDelta: 0.008,
+            } : null}
+          >
+            {selectedLocation && (
+              <Marker
+                coordinate={selectedLocation}
+                title="Ubicación seleccionada"
+                description={selectedAddress}
               />
-              <Text style={[
-                styles.serviceText,
-                selectedService?.id === service.id && styles.selectedServiceText
-              ]}>
-                {service.title}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
+            )}
+          </MapView>
 
-      <TouchableOpacity 
-        style={[
-          styles.floatingButton,
-          !selectedService && styles.floatingButtonDisabled
-        ]}
-        onPress={handleConfirmLocation}
-      >
-        <Text style={styles.floatingButtonText}>
-          {selectedService 
-            ? `Solicitar ${selectedService.title}`
-            : 'Selecciona un servicio'}
-        </Text>
-      </TouchableOpacity>
+          <View style={styles.searchBarTop}>
+            <View style={styles.searchContainer}>
+              <SearchBar
+                placeholder="Buscar dirección"
+                onChangeText={handleSearch}
+                value={searchQuery}
+                containerStyle={styles.searchBarContainer}
+                inputContainerStyle={styles.searchBarInputContainer}
+                inputStyle={styles.searchBarInput}
+                searchIcon={<Icon name="place" type="material" color="#4285F4" size={20} />}
+                platform="default"
+                lightTheme
+                onClear={() => {
+                  setSearchResults([]);
+                  setShowResults(false);
+                }}
+              />
+            </View>
 
-      <TouchableOpacity 
-        style={styles.myLocationButton}
-        onPress={handleMyLocationPress}
-      >
-        <Icon name="my-location" type="material" color="#333" size={24} />
-      </TouchableOpacity>
+            {showResults && searchResults.length > 0 && (
+              <View style={styles.searchResults}>
+                <FlatList
+                  data={searchResults}
+                  keyExtractor={(item, index) => index.toString()}
+                  renderItem={renderSearchResult}
+                  style={styles.resultsList}
+                />
+              </View>
+            )}
+
+            <ScrollView horizontal style={styles.servicesContainer} showsHorizontalScrollIndicator={false}>
+              {services.map((service) => (
+                <TouchableOpacity 
+                  key={service.id} 
+                  style={[
+                    styles.serviceCard,
+                    selectedService?.id === service.id && styles.selectedServiceCard
+                  ]}
+                  onPress={() => handleServiceSelect(service)}
+                >
+                  <Icon
+                    name={service.icon}
+                    type="font-awesome"
+                    size={20}
+                    color={selectedService?.id === service.id ? '#fff' : service.color}
+                    style={styles.serviceIcon}
+                  />
+                  <Text style={[
+                    styles.serviceText,
+                    selectedService?.id === service.id && styles.selectedServiceText
+                  ]}>
+                    {service.title}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+
+          <TouchableOpacity 
+            style={[
+              styles.floatingButton,
+              !selectedService && styles.floatingButtonDisabled
+            ]}
+            onPress={handleConfirmLocation}
+          >
+            <Text style={styles.floatingButtonText}>
+              {selectedService 
+                ? `Solicitar ${selectedService.title}`
+                : 'Selecciona un servicio'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.myLocationButton}
+            onPress={handleMyLocationPress}
+          >
+            <Icon name="my-location" type="material" color="#333" size={24} />
+          </TouchableOpacity>
+        </>
+      )}
     </View>
   );
 };

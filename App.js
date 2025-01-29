@@ -2,7 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { ThemeProvider } from '@rneui/themed';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import AppNavigator from './navigation/AppNavigator';
+import TabNavigator from './navigation/TabNavigator';
 import { CartProvider } from './context/CartContext';
 import { PharmacyProvider } from './context/PharmacyContext';
 import { MedicalRecordProvider } from './context/MedicalRecordContext';
@@ -19,7 +19,7 @@ export default function App() {
               <CartProvider>
                 <ThemeProvider>
                   <NavigationContainer>
-                    <AppNavigator />
+                    <TabNavigator />
                   </NavigationContainer>
                 </ThemeProvider>
               </CartProvider>

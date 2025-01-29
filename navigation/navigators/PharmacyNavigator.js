@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 // Pharmacy Screens
 import PharmacyScreen from '../../screens/pharmacy/PharmacyScreen';
+import PharmacyProductsScreen from '../../screens/pharmacy/PharmacyProductsScreen';
 import CategoryProductsScreen from '../../screens/pharmacy/CategoryProductsScreen';
 import ProductDetailScreen from '../../screens/pharmacy/ProductDetailScreen';
 import CartScreen from '../../screens/pharmacy/CartScreen';
@@ -20,6 +21,14 @@ const PharmacyNavigator = ({ screenOptions }) => {
         options={{
           title: 'Farmacia',
         }}
+      />
+      <Stack.Screen 
+        name="PharmacyProducts" 
+        component={PharmacyProductsScreen}
+        options={({ route }) => ({
+          title: route.params?.pharmacy?.name || 'Productos',
+          animation: 'slide_from_right',
+        })}
       />
       <Stack.Screen 
         name="CategoryProducts" 

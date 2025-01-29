@@ -2,11 +2,11 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 // Telemedicine Screens
+import ActiveConsultationsScreen from '../../screens/telemedicine/consultation/ActiveConsultationsScreen';
 import SpecialtySelectionScreen from '../../screens/telemedicine/consultation/SpecialtySelectionScreen';
 import DoctorSelectionScreen from '../../screens/telemedicine/consultation/DoctorSelectionScreen';
 import ScheduleScreen from '../../screens/telemedicine/consultation/ScheduleScreen';
 import TelemedicinePaymentScreen from '../../screens/telemedicine/consultation/PaymentScreen';
-import ActiveConsultationsScreen from '../../screens/telemedicine/consultation/ActiveConsultationsScreen';
 import ConnectionTestScreen from '../../screens/telemedicine/virtual-room/ConnectionTestScreen';
 import WaitingRoomScreen from '../../screens/telemedicine/virtual-room/WaitingRoomScreen';
 import ConsultationRoomScreen from '../../screens/telemedicine/virtual-room/ConsultationRoomScreen';
@@ -17,6 +17,13 @@ const Stack = createNativeStackNavigator();
 const TelemedicineNavigator = ({ screenOptions }) => {
   return (
     <>
+      <Stack.Screen 
+        name="TelemedicineHome" 
+        component={ActiveConsultationsScreen}
+        options={{
+          title: 'Telemedicina',
+        }}
+      />
       <Stack.Screen 
         name="SpecialtySelection" 
         component={SpecialtySelectionScreen}
@@ -57,6 +64,7 @@ const TelemedicineNavigator = ({ screenOptions }) => {
         component={ConnectionTestScreen}
         options={{
           title: 'Prueba de Conexión',
+          headerBackVisible: false,
         }}
       />
       <Stack.Screen 
@@ -64,6 +72,7 @@ const TelemedicineNavigator = ({ screenOptions }) => {
         component={WaitingRoomScreen}
         options={{
           title: 'Sala de Espera',
+          headerBackVisible: false,
         }}
       />
       <Stack.Screen 
@@ -71,6 +80,8 @@ const TelemedicineNavigator = ({ screenOptions }) => {
         component={ConsultationRoomScreen}
         options={{
           title: 'Consulta Virtual',
+          headerBackVisible: false,
+          headerShown: false,
         }}
       />
       <Stack.Screen 
@@ -78,6 +89,7 @@ const TelemedicineNavigator = ({ screenOptions }) => {
         component={PostConsultationScreen}
         options={{
           title: 'Post Consulta',
+          headerBackVisible: false,
         }}
       />
     </>
