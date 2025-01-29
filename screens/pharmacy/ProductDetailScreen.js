@@ -1,199 +1,131 @@
-import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, Alert, Image } from 'react-native';
-import { Text, Card, Button, Icon, Divider } from '@rneui/themed';
+import React, { useState } from 'react';
+import { View, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { Text, Button, Icon, Avatar } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCart } from '../../context/CartContext';
-import { usePharmacy } from '../../context/PharmacyContext';
-import { AFFILIATED_PHARMACIES } from '../../constants/pharmacy/affiliates';
 
-const PharmacyAvailabilityCard = ({ 
-  availability, 
-  pharmacy, 
-  onSelectPharmacy,
-  isSelected 
-}) => (
-  <Card containerStyle={[
-    styles.pharmacyCard,
-    isSelected && styles.selectedPharmacyCard
-  ]}>
-    <View style={styles.pharmacyHeader}>
-      <View>
-        <Text style={styles.pharmacyName}>{pharmacy.name}</Text>
-        <Text style={styles.pharmacyAddress}>{pharmacy.address}</Text>
-      </View>
-      <View style={styles.pharmacyInfo}>
-        <Icon
-          name="clock-outline"
-          type="material-community"
-          size={16}
-          color="#666"
-        />
-        <Text style={styles.deliveryTime}>{pharmacy.deliveryTime}</Text>
-      </View>
-    </View>
-
-    <Divider style={styles.divider} />
-
-    <View style={styles.availabilityInfo}>
-      <View style={styles.priceContainer}>
-        <Text style={styles.priceLabel}>Precio:</Text>
-        <Text style={styles.price}>Bs. {availability.price.toFixed(2)}</Text>
-      </View>
-
-      <View style={styles.stockContainer}>
-        <Text style={styles.stockLabel}>Stock:</Text>
-        <Text style={[
-          styles.stock,
-          availability.stock === 0 && styles.outOfStock
-        ]}>
-          {availability.stock > 0 ? `${availability.stock} unidades` : 'Agotado'}
-        </Text>
-      </View>
-
-      {availability.canPartialDeliver && (
-        <View style={styles.partialDeliveryContainer}>
-          <Icon
-            name="check-circle"
-            type="material-community"
-            size={16}
-            color="#4CAF50"
-          />
-          <Text style={styles.partialDeliveryText}>
-            Permite entrega parcial
-          </Text>
-        </View>
-      )}
-    </View>
-
-    <Button
-      title={isSelected ? "Seleccionado" : "Seleccionar Farmacia"}
-      onPress={() => onSelectPharmacy(pharmacy.id)}
-      disabled={availability.stock === 0 || isSelected}
-      buttonStyle={[
-        styles.selectButton,
-        isSelected && styles.selectedButton
-      ]}
-    />
-  </Card>
-);
+const { width } = Dimensions.get('window');
 
 const ProductDetailScreen = ({ route, navigation }) => {
-  const { product, preselectedPharmacy, pharmacyAvailability } = route.params;
+  const { product } = route.params || {};
+  const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
-  const { selectedPharmacy, selectPharmacy } = usePharmacy();
 
-  useEffect(() => {
-    // Si hay una farmacia preseleccionada, usarla
-    if (preselectedPharmacy) {
-      selectPharmacy(preselectedPharmacy.id);
-    }
-  }, [preselectedPharmacy]);
+  // Si no hay producto, mostramos un mensaje de error
+  if (!product) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>Producto no encontrado</Text>
+          <Button
+            title="Volver"
+            onPress={() => navigation.goBack()}
+            type="outline"
+          />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   const handleAddToCart = () => {
-    if (product.requiresPrescription) {
-      navigation.navigate('UploadPrescription', {
-        fromProduct: true,
-        product: {
-          ...product,
-          price: pharmacyAvailability.price,
-          pharmacyId: preselectedPharmacy.id
-        }
-      });
-    } else {
-      addToCart({
-        ...product,
-        price: pharmacyAvailability.price,
-        pharmacyId: preselectedPharmacy.id
-      });
-      Alert.alert(
-        'Éxito',
-        'Producto agregado al carrito',
-        [
-          {
-            text: 'Seguir comprando',
-            style: 'cancel',
-          },
-          {
-            text: 'Ir al carrito',
-            onPress: () => navigation.navigate('Cart'),
-          },
-        ]
-      );
+    addToCart({ ...product, quantity });
+    navigation.goBack();
+  };
+
+  const handleQuantityChange = (increment) => {
+    const newQuantity = quantity + increment;
+    if (newQuantity > 0) {
+      setQuantity(newQuantity);
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <Card containerStyle={styles.productCard}>
-          <Image
-            source={product.image}
-            style={styles.productImage}
-            resizeMode="contain"
+      <View style={styles.header}>
+        <Button
+          icon={<Icon name="arrow-left" type="material-community" size={24} color="#000" />}
+          type="clear"
+          onPress={() => navigation.goBack()}
+          containerStyle={styles.backButton}
+        />
+        <Text style={styles.headerTitle}>Detalle del Producto</Text>
+      </View>
+
+      <ScrollView 
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+        bounces={true}
+      >
+        <View style={styles.productImageContainer}>
+          <Avatar
+            size={width * 0.5}
+            title={product.initial}
+            containerStyle={styles.productImage}
+            backgroundColor="#E8EAF6"
+            titleStyle={{ color: '#3F51B5', fontSize: width * 0.15 }}
           />
-          <View style={styles.productTypeTag}>
-            <Text style={styles.productTypeText}>{product.type}</Text>
-          </View>
-          
+        </View>
+
+        <View style={styles.productInfo}>
           <Text style={styles.productName}>{product.name}</Text>
-          <Text style={styles.brand}>{product.brand}</Text>
-          <Text style={styles.presentation}>{product.presentation}</Text>
+          <Text style={styles.productPrice}>$ {product.price}</Text>
+          <Text style={styles.productUnit}>{product.quantity} · ${product.pricePerUnit}/un</Text>
+        </View>
 
-          {product.requiresPrescription && (
-            <View style={styles.prescriptionBadge}>
-              <Icon
-                name="file-document"
-                type="material-community"
-                size={16}
-                color="#666"
-              />
-              <Text style={styles.prescriptionText}>Requiere receta médica</Text>
-            </View>
-          )}
-
-          <Divider style={styles.divider} />
-          
-          <Text style={styles.sectionTitle}>Detalles del producto</Text>
-          <Text style={styles.description}>{product.description}</Text>
-          
-          <View style={styles.detailsGrid}>
-            {product.activeIngredient && (
-              <View style={styles.detailItem}>
-                <Text style={styles.detailLabel}>Principio activo:</Text>
-                <Text style={styles.detailValue}>{product.activeIngredient}</Text>
-              </View>
-            )}
-            {product.administration && (
-              <View style={styles.detailItem}>
-                <Text style={styles.detailLabel}>Administración:</Text>
-                <Text style={styles.detailValue}>{product.administration}</Text>
-              </View>
-            )}
+        <View style={styles.quantityContainer}>
+          <Text style={styles.quantityLabel}>Cantidad:</Text>
+          <View style={styles.quantitySelector}>
+            <Button
+              icon={<Icon name="minus" type="material-community" size={24} color="#2196F3" />}
+              type="clear"
+              onPress={() => handleQuantityChange(-1)}
+              disabled={quantity <= 1}
+            />
+            <Text style={styles.quantityText}>{quantity}</Text>
+            <Button
+              icon={<Icon name="plus" type="material-community" size={24} color="#2196F3" />}
+              type="clear"
+              onPress={() => handleQuantityChange(1)}
+            />
           </View>
+          <Text style={styles.totalText}>Total: $ {(product.price * quantity).toFixed(2)}</Text>
+        </View>
 
-          <View style={styles.priceContainer}>
-            <Text style={styles.priceLabel}>Precio en {preselectedPharmacy.name}:</Text>
-            <Text style={styles.price}>Bs. {pharmacyAvailability.price.toFixed(2)}</Text>
+        <View style={styles.descriptionContainer}>
+          <Text style={styles.descriptionTitle}>Descripción</Text>
+          <Text style={styles.descriptionText}>
+            Medicamento de venta libre. Consulte a su médico si los síntomas persisten.
+          </Text>
+        </View>
+
+        <View style={styles.infoContainer}>
+          <Text style={styles.infoTitle}>Información Importante</Text>
+          <View style={styles.infoItem}>
+            <Icon name="information" type="material-community" size={20} color="#666" />
+            <Text style={styles.infoText}>Conservar en lugar fresco y seco</Text>
           </View>
-        </Card>
+          <View style={styles.infoItem}>
+            <Icon name="alert-circle" type="material-community" size={20} color="#666" />
+            <Text style={styles.infoText}>Mantener fuera del alcance de los niños</Text>
+          </View>
+          <View style={styles.infoItem}>
+            <Icon name="pill" type="material-community" size={20} color="#666" />
+            <Text style={styles.infoText}>Siga la dosificación indicada por su médico</Text>
+          </View>
+        </View>
+
+        <View style={styles.spacing} />
       </ScrollView>
 
-      <Card containerStyle={styles.bottomCard}>
+      <View style={styles.footer}>
         <Button
-          title={product.requiresPrescription ? "Continuar con receta" : "Agregar al carrito"}
+          title="Agregar al carrito"
           onPress={handleAddToCart}
-          buttonStyle={styles.addButton}
-          icon={
-            <Icon
-              name={product.requiresPrescription ? "file-upload" : "cart-plus"}
-              type="material-community"
-              color="white"
-              size={20}
-              style={{ marginRight: 10 }}
-            />
-          }
+          buttonStyle={styles.addToCartButton}
+          titleStyle={styles.addToCartButtonText}
+          icon={<Icon name="cart-plus" type="material-community" size={24} color="#FFF" style={{ marginRight: 8 }} />}
         />
-      </Card>
+      </View>
     </SafeAreaView>
   );
 };
@@ -201,202 +133,160 @@ const ProductDetailScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fff',
   },
-  productCard: {
-    borderRadius: 10,
-    marginBottom: 15,
-    padding: 15,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
   },
-  productImage: {
-    width: '100%',
-    height: 200,
-    marginBottom: 16,
-    borderRadius: 8,
-    backgroundColor: '#f5f5f5',
-  },
-  productTypeTag: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    backgroundColor: '#2A5C82',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  productTypeText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  productName: {
+  headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 5,
+    marginLeft: 16,
   },
-  brand: {
+  backButton: {
+    marginRight: 8,
+  },
+  content: {
+    flex: 1,
+  },
+  productImageContainer: {
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  productImage: {
+    marginBottom: 20,
+  },
+  productInfo: {
+    padding: 20,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  productName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  productPrice: {
+    fontSize: 22,
+    color: '#2196F3',
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  productUnit: {
     fontSize: 16,
     color: '#666',
-    marginBottom: 5,
   },
-  presentation: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 10,
+  quantityContainer: {
+    padding: 20,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
   },
-  prescriptionBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    padding: 8,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  prescriptionText: {
-    fontSize: 14,
-    color: '#666',
-    marginLeft: 5,
-  },
-  divider: {
-    marginVertical: 15,
-  },
-  sectionTitle: {
+  quantityLabel: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
+    marginBottom: 12,
   },
-  description: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
-    marginBottom: 15,
-  },
-  detailsGrid: {
+  quantitySelector: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
   },
-  detailItem: {
-    width: '50%',
-    marginBottom: 10,
+  quantityText: {
+    fontSize: 24,
+    marginHorizontal: 24,
+    minWidth: 40,
+    textAlign: 'center',
   },
-  detailLabel: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 2,
+  totalText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#2196F3',
   },
-  detailValue: {
-    fontSize: 14,
-    color: '#333',
-    fontWeight: '500',
+  descriptionContainer: {
+    padding: 20,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
   },
-  availabilityTitle: {
+  descriptionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
-    margin: 15,
+    marginBottom: 12,
   },
-  pharmacyCard: {
-    borderRadius: 10,
-    marginBottom: 10,
-    padding: 15,
-  },
-  selectedPharmacyCard: {
-    borderColor: '#0077B6',
-    borderWidth: 2,
-  },
-  pharmacyHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 10,
-  },
-  pharmacyName: {
+  descriptionText: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 2,
-  },
-  pharmacyAddress: {
-    fontSize: 14,
     color: '#666',
+    lineHeight: 24,
   },
-  pharmacyInfo: {
+  infoContainer: {
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  infoTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  infoItem: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 12,
   },
-  deliveryTime: {
-    fontSize: 14,
-    color: '#666',
-    marginLeft: 5,
-  },
-  availabilityInfo: {
-    marginVertical: 10,
-  },
-  priceContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 5,
-  },
-  priceLabel: {
-    fontSize: 14,
-    color: '#666',
-  },
-  price: {
+  infoText: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#0077B6',
-  },
-  stockContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 5,
-  },
-  stockLabel: {
-    fontSize: 14,
     color: '#666',
+    marginLeft: 12,
+    flex: 1,
   },
-  stock: {
-    fontSize: 14,
-    color: '#4CAF50',
+  spacing: {
+    height: 100,
   },
-  outOfStock: {
-    color: '#F44336',
-  },
-  partialDeliveryContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 5,
-  },
-  partialDeliveryText: {
-    fontSize: 14,
-    color: '#4CAF50',
-    marginLeft: 5,
-  },
-  selectButton: {
-    borderRadius: 25,
-    marginTop: 10,
-    backgroundColor: '#0077B6',
-  },
-  selectedButton: {
-    backgroundColor: '#4CAF50',
-  },
-  bottomCard: {
+  footer: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    margin: 0,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 15,
+    backgroundColor: '#fff',
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
-  addButton: {
-    borderRadius: 25,
+  addToCartButton: {
+    backgroundColor: '#2196F3',
+    borderRadius: 8,
     paddingVertical: 12,
-    backgroundColor: '#0077B6',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addToCartButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 18,
+    marginBottom: 20,
+    color: '#666',
   },
 });
 

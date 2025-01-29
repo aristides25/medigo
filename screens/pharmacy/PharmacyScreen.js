@@ -1,198 +1,293 @@
 import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet, TouchableOpacity, FlatList, Image } from 'react-native';
-import { Text, SearchBar, Icon, Badge } from '@rneui/themed';
+import { View, StyleSheet, TouchableOpacity, FlatList, Alert, ScrollView } from 'react-native';
+import { Text, SearchBar, Icon, Badge, Avatar } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CATEGORIES, PRODUCTS } from '../../constants/pharmacy/products';
+import { useCart } from '../../context/CartContext';
 
 const PHARMACIES = [
-  { id: 1, name: 'Farmacia San José', rating: 4.8, isOpen: true },
-  { id: 2, name: 'Farmatodo Las Mercedes', rating: 4.5, isOpen: true },
-  { id: 3, name: 'Farmacia La Trinidad', rating: 4.7, isOpen: false },
-  { id: 4, name: 'Farmacia El Cafetal', rating: 4.6, isOpen: true },
-  { id: 5, name: 'Locatel Santa Paula', rating: 4.4, isOpen: true },
+  {
+    id: '1',
+    name: 'Farmacia San José',
+    rating: 4.8,
+    deliveryTime: '10-25 min',
+    deliveryFee: 1.99,
+    isOpen: true,
+    initial: 'SJ',
+    minOrder: 9
+  },
+  {
+    id: '2',
+    name: 'Farmacia La Trinidad',
+    rating: 4.5,
+    deliveryTime: '15-30 min',
+    deliveryFee: 2.50,
+    isOpen: true,
+    initial: 'LT',
+    minOrder: 12
+  },
+  {
+    id: '3',
+    name: 'Farmacia Santa María',
+    rating: 4.7,
+    deliveryTime: '20-35 min',
+    deliveryFee: 1.75,
+    isOpen: false,
+    initial: 'SM',
+    minOrder: 10
+  }
 ];
+
+const RECOMMENDED_PRODUCTS = [
+  {
+    id: '1',
+    name: 'Paracetamol 500mg',
+    price: 12.99,
+    quantity: '20 tabletas',
+    pricePerUnit: 0.65,
+    initial: 'P'
+  },
+  {
+    id: '2',
+    name: 'Ibuprofeno 400mg',
+    price: 15.99,
+    quantity: '30 tabletas',
+    pricePerUnit: 0.53,
+    initial: 'I'
+  },
+  {
+    id: '3',
+    name: 'Vitamina C',
+    price: 24.99,
+    quantity: '60 tabletas',
+    pricePerUnit: 0.42,
+    initial: 'V'
+  }
+];
+
+const BEST_SELLERS = [
+  {
+    id: '4',
+    name: 'Omeprazol 20mg',
+    price: 18.99,
+    quantity: '14 cápsulas',
+    pricePerUnit: 1.36,
+    initial: 'O'
+  },
+  {
+    id: '5',
+    name: 'Loratadina 10mg',
+    price: 14.99,
+    quantity: '10 tabletas',
+    pricePerUnit: 1.49,
+    initial: 'L'
+  },
+  {
+    id: '6',
+    name: 'Aspirina 500mg',
+    price: 9.99,
+    quantity: '20 tabletas',
+    pricePerUnit: 0.50,
+    initial: 'A'
+  }
+];
+
+const calculateTotal = (items) => {
+  return items.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
+};
 
 const PharmacyScreen = ({ navigation }) => {
   const [search, setSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedPharmacy, setSelectedPharmacy] = useState(null);
-  const cartItemsCount = 3; // Este valor vendría de tu contexto de carrito
+  const { cartItems = [] } = useCart();
+  const [filteredPharmacies, setFilteredPharmacies] = useState(PHARMACIES);
+  const [selectedFilter, setSelectedFilter] = useState('all');
 
-  const renderProduct = ({ item }) => {
-    // Encontrar la disponibilidad para la farmacia seleccionada
-    const pharmacyAvailability = selectedPharmacy 
-      ? item.availability.find(a => a.pharmacyId === `ph${selectedPharmacy.id}`)
-      : item.availability[0];
+  const filters = [
+    { id: 'all', name: 'Todos', icon: 'apps' },
+    { id: 'open', name: 'Abiertos', icon: 'clock-outline' },
+    { id: 'rating', name: 'Mejor valorados', icon: 'star-outline' },
+    { id: 'delivery', name: 'Menor envío', icon: 'bike' }
+  ];
 
-    if (!pharmacyAvailability) return null;
-
-    return (
-      <TouchableOpacity 
-        style={styles.productCard}
-        onPress={() => navigation.navigate('ProductDetail', { 
-          product: item,
-          preselectedPharmacy: selectedPharmacy,
-          pharmacyAvailability: pharmacyAvailability
-        })}
-      >
-        <Image
-          source={item.image}
-          style={styles.productImage}
-          resizeMode="contain"
-        />
-        <View style={styles.productTypeTag}>
-          <Text style={styles.productTypeText}>{item.type}</Text>
-        </View>
-        <Text style={styles.productName}>{item.name}</Text>
-        <Text style={styles.productPrice}>Desde ${pharmacyAvailability.price}</Text>
-      </TouchableOpacity>
-    );
-  };
-
-  const filteredProducts = PRODUCTS.filter(product => {
-    let matchesCategory = true;
-    let matchesSearch = true;
-    let matchesPharmacy = true;
-
-    if (selectedCategory) {
-      matchesCategory = product.category === selectedCategory.name;
-    }
-
-    if (search) {
-      matchesSearch = product.name.toLowerCase().includes(search.toLowerCase());
-    }
-
-    if (selectedPharmacy) {
-      // Verificar si el producto está disponible en la farmacia seleccionada
-      matchesPharmacy = product.availability.some(
-        a => a.pharmacyId === `ph${selectedPharmacy.id}` && a.stock > 0
+  const handlePharmacySelect = (pharmacy) => {
+    if (pharmacy.isOpen) {
+      navigation.navigate('PharmacyProducts', { 
+        pharmacy,
+        screen: 'PharmacyProducts'
+      });
+    } else {
+      Alert.alert(
+        'Farmacia Cerrada',
+        'Esta farmacia no está disponible en este momento.',
+        [{ text: 'Entendido', style: 'default' }]
       );
     }
+  };
 
-    return matchesCategory && matchesSearch && matchesPharmacy;
-  });
+  const handleSearch = (text) => {
+    setSearch(text);
+    filterPharmacies(text, selectedFilter);
+  };
+
+  const handleFilterSelect = (filterId) => {
+    setSelectedFilter(filterId);
+    filterPharmacies(search, filterId);
+  };
+
+  const filterPharmacies = (searchText, filter) => {
+    let filtered = PHARMACIES.filter(pharmacy =>
+      pharmacy.name.toLowerCase().includes(searchText.toLowerCase())
+    );
+
+    switch (filter) {
+      case 'open':
+        filtered = filtered.filter(pharmacy => pharmacy.isOpen);
+        break;
+      case 'rating':
+        filtered = filtered.sort((a, b) => b.rating - a.rating);
+        break;
+      case 'delivery':
+        filtered = filtered.sort((a, b) => a.deliveryFee - b.deliveryFee);
+        break;
+    }
+
+    setFilteredPharmacies(filtered);
+  };
+
+  const renderPharmacyCard = ({ item }) => (
+    <TouchableOpacity 
+      style={styles.pharmacyCard}
+      onPress={() => handlePharmacySelect(item)}
+      activeOpacity={0.7}
+    >
+      <View style={styles.pharmacyHeader}>
+        <Avatar
+          size={50}
+          rounded
+          title={item.initial}
+          containerStyle={styles.pharmacyLogo}
+          backgroundColor="#2196F3"
+        />
+        <View style={styles.pharmacyInfo}>
+          <Text style={styles.pharmacyName}>{item.name}</Text>
+          <View style={styles.ratingContainer}>
+            <Icon name="star" type="material-community" color="#FFD700" size={16} />
+            <Text style={styles.ratingText}>{item.rating}</Text>
+          </View>
+        </View>
+        <View style={item.isOpen ? styles.openBadge : styles.closedBadge}>
+          <Text style={item.isOpen ? styles.openText : styles.closedText}>
+            {item.isOpen ? 'Abierto' : 'Cerrado'}
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.deliveryInfo}>
+        <View style={styles.infoItem}>
+          <Icon name="clock-outline" type="material-community" size={16} color="#666" />
+          <Text style={styles.infoText}>{item.deliveryTime}</Text>
+        </View>
+        <View style={styles.infoItem}>
+          <Icon name="bike" type="material-community" size={16} color="#666" />
+          <Text style={styles.infoText}>Envío ${item.deliveryFee}</Text>
+        </View>
+        <View style={styles.infoItem}>
+          <Icon name="cart-outline" type="material-community" size={16} color="#666" />
+          <Text style={styles.infoText}>Mín. ${item.minOrder}</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+
+  const renderFilterItem = ({ item }) => (
+    <TouchableOpacity
+      style={[
+        styles.filterItem,
+        selectedFilter === item.id && styles.filterItemSelected
+      ]}
+      onPress={() => handleFilterSelect(item.id)}
+      activeOpacity={0.7}
+    >
+      <Icon
+        name={item.icon}
+        type="material-community"
+        size={20}
+        color={selectedFilter === item.id ? '#fff' : '#666'}
+      />
+      <Text style={[
+        styles.filterText,
+        selectedFilter === item.id && styles.filterTextSelected
+      ]}>
+        {item.name}
+      </Text>
+    </TouchableOpacity>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <SearchBar
-          placeholder="Buscar productos..."
-          onChangeText={setSearch}
-          value={search}
-          containerStyle={styles.searchContainer}
-          inputContainerStyle={styles.searchInputContainer}
-          inputStyle={{ fontSize: 14 }}
-          searchIcon={{ size: 24, color: '#2A5C82' }}
-          platform="default"
-          round
-          lightTheme
-        />
+      <View style={styles.fixedHeader}>
+        <View style={styles.headerContainer}>
+          <TouchableOpacity 
+            onPress={() => navigation.goBack()} 
+            style={styles.backButton}
+          >
+            <Icon name="arrow-left" type="material-community" size={24} color="#000" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Farmacias</Text>
+        </View>
+
+        <View style={styles.searchSection}>
+          <View style={styles.searchBarContainer}>
+            <Icon
+              name="magnify"
+              type="material-community"
+              size={24}
+              color="#666"
+              style={styles.searchIcon}
+            />
+            <SearchBar
+              placeholder="Buscar farmacias..."
+              onChangeText={handleSearch}
+              value={search}
+              containerStyle={styles.searchContainer}
+              inputContainerStyle={styles.searchInputContainer}
+              inputStyle={styles.searchInput}
+              platform="default"
+              searchIcon={null}
+              clearIcon={{ size: 20 }}
+            />
+          </View>
+
+          <FlatList
+            data={filters}
+            renderItem={renderFilterItem}
+            keyExtractor={item => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.filtersList}
+          />
+        </View>
+      </View>
+
+      <FlatList
+        data={filteredPharmacies}
+        renderItem={renderPharmacyCard}
+        keyExtractor={item => item.id}
+        contentContainerStyle={styles.pharmaciesList}
+        showsVerticalScrollIndicator={false}
+        style={styles.pharmaciesListContainer}
+      />
+
+      {cartItems && cartItems.length > 0 && (
         <TouchableOpacity 
           style={styles.cartButton}
           onPress={() => navigation.navigate('Cart')}
+          activeOpacity={0.8}
         >
-          <Icon
-            name="cart"
-            type="material-community"
-            color="#FFFFFF"
-            size={24}
-          />
-          {cartItemsCount > 0 && (
-            <Badge
-              value={cartItemsCount}
-              status="error"
-              containerStyle={styles.badge}
-            />
-          )}
+          <Text style={styles.cartItemCount}>{cartItems.length} producto{cartItems.length > 1 ? 's' : ''}</Text>
+          <Text style={styles.cartTotal}>$ {calculateTotal(cartItems)}</Text>
+          <Text style={styles.viewCartText}>Ver mi carrito</Text>
         </TouchableOpacity>
-      </View>
-
-      <View style={styles.content}>
-        {/* Categorías - Lista horizontal */}
-        <View style={styles.categoriesSection}>
-          <Text style={styles.sectionTitle}>Categorías</Text>
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.categoriesContainer}
-          >
-            {CATEGORIES.map(category => (
-              <TouchableOpacity
-                key={category.id}
-                style={[
-                  styles.categoryItem,
-                  selectedCategory?.id === category.id && styles.selectedItem
-                ]}
-                onPress={() => setSelectedCategory(category)}
-              >
-                <Icon
-                  name={category.icon}
-                  type="material-community"
-                  color={selectedCategory?.id === category.id ? '#2A5C82' : '#666666'}
-                  size={24}
-                />
-                <Text 
-                  style={[
-                    styles.categoryName,
-                    selectedCategory?.id === category.id && { color: '#2A5C82', fontWeight: '500' }
-                  ]}
-                >
-                  {category.name}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-
-        {/* Farmacias - Lista horizontal */}
-        <View style={styles.pharmaciesSection}>
-          <Text style={styles.sectionTitle}>Farmacias</Text>
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.pharmaciesContainer}
-          >
-            {PHARMACIES.map(pharmacy => (
-              <TouchableOpacity
-                key={pharmacy.id}
-                style={[
-                  styles.pharmacyItem,
-                  selectedPharmacy?.id === pharmacy.id && styles.selectedItem
-                ]}
-                onPress={() => setSelectedPharmacy(pharmacy)}
-              >
-                <Text style={styles.pharmacyName}>{pharmacy.name}</Text>
-                <View style={styles.pharmacyInfo}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Icon name="star" type="material-community" color="#FFD700" size={18} />
-                    <Text style={styles.pharmacyRating}>{pharmacy.rating}</Text>
-                  </View>
-                  {pharmacy.isOpen && (
-                    <View style={styles.openBadge}>
-                      <Text style={styles.openBadgeText}>Abierto</Text>
-                    </View>
-                  )}
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-
-        {/* Productos - Grid */}
-        <View style={styles.productsSection}>
-          <Text style={styles.sectionTitle}>
-            {selectedCategory ? selectedCategory.name : 'Todos los productos'}
-            {selectedPharmacy ? ` en ${selectedPharmacy.name}` : ''}
-          </Text>
-          <FlatList
-            data={filteredProducts}
-            renderItem={renderProduct}
-            keyExtractor={item => item.id}
-            numColumns={2}
-            contentContainerStyle={styles.productsList}
-          />
-        </View>
-      </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -200,14 +295,51 @@ const PharmacyScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#2A5C82',
+    backgroundColor: '#fff',
   },
-  header: {
+  fixedHeader: {
+    backgroundColor: '#fff',
+    zIndex: 1,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#2A5C82',
     paddingHorizontal: 16,
-    paddingBottom: 8,
+    paddingVertical: 12,
+    backgroundColor: '#fff',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginLeft: 16,
+  },
+  backButton: {
+    padding: 8,
+  },
+  searchSection: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 12,
+  },
+  searchBarContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    marginBottom: 12,
+    height: 48,
+    borderWidth: 1,
+    borderColor: '#eeeeee',
+  },
+  searchIcon: {
+    marginRight: 8,
   },
   searchContainer: {
     flex: 1,
@@ -215,172 +347,178 @@ const styles = StyleSheet.create({
     borderTopWidth: 0,
     borderBottomWidth: 0,
     padding: 0,
-    marginRight: 8,
-    height: 50,
+    marginVertical: 0,
   },
   searchInputContainer: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
+    backgroundColor: 'transparent',
+    borderRadius: 0,
+    padding: 0,
     height: 40,
   },
-  cartButton: {
-    padding: 8,
+  searchInput: {
+    fontSize: 16,
+    color: '#333',
   },
-  badge: {
-    position: 'absolute',
-    top: -4,
-    right: -4,
+  filtersList: {
+    paddingVertical: 4,
   },
-  content: {
-    flex: 1,
-    backgroundColor: '#F5F5F5',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#2A5C82',
-    marginBottom: 12,
-    paddingHorizontal: 16,
-  },
-  // Estilos para la sección de categorías
-  categoriesSection: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 12,
-  },
-  categoriesContainer: {
-    paddingHorizontal: 12,
-  },
-  categoryItem: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 12,
-    marginHorizontal: 6,
-    borderRadius: 8,
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-    width: 100,
-  },
-  categoryName: {
-    marginTop: 8,
-    fontSize: 12,
-    color: '#333333',
-    textAlign: 'center',
-  },
-  // Estilos para la sección de farmacias
-  pharmaciesSection: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 12,
-    marginTop: 8,
-  },
-  pharmaciesContainer: {
-    paddingHorizontal: 12,
-  },
-  pharmacyItem: {
-    padding: 12,
-    marginHorizontal: 6,
-    borderRadius: 8,
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-    width: 200,
-  },
-  pharmacyName: {
-    fontSize: 14,
-    marginBottom: 8,
-    color: '#333333',
-    fontWeight: '500',
-  },
-  pharmacyInfo: {
+  filterItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    backgroundColor: '#f5f5f5',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginRight: 12,
+    borderWidth: 1,
+    borderColor: '#eeeeee',
   },
-  pharmacyRating: {
-    marginLeft: 4,
+  filterItemSelected: {
+    backgroundColor: '#2196F3',
+    borderColor: '#1976D2',
+  },
+  filterText: {
+    marginLeft: 8,
     fontSize: 14,
-    color: '#666666',
+    color: '#666',
     fontWeight: '500',
   },
-  // Estilos para la sección de productos
-  productsSection: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    marginTop: 8,
-    paddingTop: 12,
+  filterTextSelected: {
+    color: '#fff',
   },
-  productCard: {
+  pharmaciesListContainer: {
     flex: 1,
-    margin: 6,
-    padding: 12,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
+    marginTop: 8,
+  },
+  pharmaciesList: {
+    padding: 16,
+  },
+  pharmacyCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
-    position: 'relative',
+  },
+  pharmacyHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  pharmacyLogo: {
+    marginRight: 12,
+  },
+  pharmacyInfo: {
+    flex: 1,
+  },
+  pharmacyName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  ratingText: {
+    marginLeft: 4,
+    color: '#666',
+  },
+  openBadge: {
+    backgroundColor: '#E8F5E9',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  closedBadge: {
+    backgroundColor: '#FFEBEE',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  openText: {
+    color: '#2E7D32',
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  closedText: {
+    color: '#C62828',
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  deliveryInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 8,
+  },
+  infoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  infoText: {
+    marginLeft: 4,
+    color: '#666',
+    fontSize: 12,
+  },
+  cartButton: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#E91E63',
+    padding: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  cartItemCount: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  cartTotal: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  viewCartText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  productCard: {
+    width: 160,
+    marginRight: 16,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   productImage: {
     width: '100%',
     height: 120,
     marginBottom: 8,
-    borderRadius: 4,
-    backgroundColor: '#f5f5f5',
   },
-  productTypeTag: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: '#2A5C82',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  productTypeText: {
-    color: '#FFFFFF',
-    fontSize: 10,
-    fontWeight: '500',
+  productPrice: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 4,
   },
   productName: {
     fontSize: 14,
-    color: '#333333',
-    marginBottom: 8,
-    fontWeight: '500',
+    marginBottom: 4,
   },
-  productPrice: {
-    fontSize: 16,
-    color: '#28A745',
-    fontWeight: 'bold',
-  },
-  productsList: {
-    paddingHorizontal: 10,
-    paddingBottom: 20,
-  },
-  selectedItem: {
-    borderColor: '#2A5C82',
-    borderWidth: 2,
-  },
-  openBadge: {
-    backgroundColor: '#C8E6C9',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  openBadgeText: {
-    color: '#1B5E20',
+  productUnit: {
     fontSize: 12,
-    fontWeight: '500',
+    color: '#666',
   },
 });
 
