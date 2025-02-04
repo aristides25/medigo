@@ -102,6 +102,7 @@ const EmergencyTrackingScreen = ({ route, navigation }) => {
   const [progress, setProgress] = useState(0.1);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const slideAnim = useRef(new Animated.Value(0)).current;
+  const mapRef = useRef(null);
 
   const toggleDetails = () => {
     const toValue = isDetailsOpen ? 0 : 1;
@@ -171,6 +172,18 @@ const EmergencyTrackingScreen = ({ route, navigation }) => {
     }
   }, [ambulanceLocation, selectedLocation]);
 
+  useEffect(() => {
+    if (mapRef.current && selectedLocation) {
+      // Centrar el mapa en la ubicación seleccionada con zoom cercano
+      mapRef.current.animateToRegion({
+        latitude: selectedLocation.latitude,
+        longitude: selectedLocation.longitude,
+        latitudeDelta: 0.002,
+        longitudeDelta: 0.002,
+      }, 1000);
+    }
+  }, [selectedLocation]);
+
   const renderProgressBar = () => {
     const estados = Object.keys(ESTADOS_SERVICIO);
     const currentIndex = estados.indexOf(currentState);
@@ -225,14 +238,19 @@ const EmergencyTrackingScreen = ({ route, navigation }) => {
     <View style={styles.container}>
       {renderProgressBar()}
       <MapView
+        ref={mapRef}
         style={styles.map}
         initialRegion={{
-          ...selectedLocation,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
+          latitude: selectedLocation.latitude,
+          longitude: selectedLocation.longitude,
+          latitudeDelta: 0.002,
+          longitudeDelta: 0.002,
         }}
         showsUserLocation={true}
         showsMyLocationButton={true}
+        showsCompass={true}
+        minZoomLevel={15}
+        maxZoomLevel={20}
       >
         {/* Ruta de la ambulancia */}
         {routeCoordinates.length > 0 && (
@@ -325,7 +343,7 @@ const EmergencyTrackingScreen = ({ route, navigation }) => {
               <Icon name="user-circle" type="font-awesome" color="#757575" size={20} />
               <View style={styles.detailTextContainer}>
                 <Text style={styles.detailLabel}>Nombre del Paciente</Text>
-                <Text style={styles.detailValue}>{emergencyDetails?.paciente || 'No especificado'}</Text>
+                <Text style={styles.detailValue}>{emergencyDetails?.patientName || 'No especificado'}</Text>
               </View>
             </View>
 
@@ -333,23 +351,69 @@ const EmergencyTrackingScreen = ({ route, navigation }) => {
               <Icon name="calendar" type="font-awesome" color="#757575" size={20} />
               <View style={styles.detailTextContainer}>
                 <Text style={styles.detailLabel}>Edad</Text>
-                <Text style={styles.detailValue}>{emergencyDetails?.edad || 'No especificada'}</Text>
+                <Text style={styles.detailValue}>{emergencyDetails?.age || 'No especificada'}</Text>
               </View>
             </View>
+
+            <View style={styles.detailRow}>
+              <Icon name="tint" type="font-awesome" color="#757575" size={20} />
+              <View style={styles.detailTextContainer}>
+                <Text style={styles.detailLabel}>Tipo de Sangre</Text>
+                <Text style={styles.detailValue}>{emergencyDetails?.bloodType || 'No especificado'}</Text>
+              </View>
+            </View>
+
+            <View style={styles.detailRow}>
+              <Icon name="phone" type="font-awesome" color="#757575" size={20} />
+              <View style={styles.detailTextContainer}>
+                <Text style={styles.detailLabel}>Teléfono</Text>
+                <Text style={styles.detailValue}>{emergencyDetails?.phone || 'No especificado'}</Text>
+              </View>
+            </View>
+
+            <View style={styles.detailRow}>
+              <Icon name="map-marker" type="font-awesome" color="#757575" size={20} />
+              <View style={styles.detailTextContainer}>
+                <Text style={styles.detailLabel}>Dirección</Text>
+                <Text style={styles.detailValue}>{emergencyDetails?.address || 'No especificada'}</Text>
+              </View>
+            </View>
+
+            <View style={styles.sectionDivider} />
+            <Text style={styles.subSectionTitle}>Contacto de Emergencia</Text>
+
+            <View style={styles.detailRow}>
+              <Icon name="user" type="font-awesome" color="#757575" size={20} />
+              <View style={styles.detailTextContainer}>
+                <Text style={styles.detailLabel}>Nombre del Contacto</Text>
+                <Text style={styles.detailValue}>{emergencyDetails?.emergencyContact || 'No especificado'}</Text>
+              </View>
+            </View>
+
+            <View style={styles.detailRow}>
+              <Icon name="phone" type="font-awesome" color="#757575" size={20} />
+              <View style={styles.detailTextContainer}>
+                <Text style={styles.detailLabel}>Teléfono del Contacto</Text>
+                <Text style={styles.detailValue}>{emergencyDetails?.emergencyPhone || 'No especificado'}</Text>
+              </View>
+            </View>
+
+            <View style={styles.sectionDivider} />
+            <Text style={styles.subSectionTitle}>Información de la Emergencia</Text>
 
             <View style={styles.detailRow}>
               <Icon name="heartbeat" type="font-awesome" color="#757575" size={20} />
               <View style={styles.detailTextContainer}>
                 <Text style={styles.detailLabel}>Síntomas</Text>
-                <Text style={styles.detailValue}>{emergencyDetails?.sintomas || 'No especificados'}</Text>
+                <Text style={styles.detailValue}>{emergencyDetails?.symptoms || 'No especificados'}</Text>
               </View>
             </View>
 
             <View style={styles.detailRow}>
-              <Icon name="file-text" type="font-awesome" color="#757575" size={20} />
+              <Icon name="ambulance" type="font-awesome" color="#757575" size={20} />
               <View style={styles.detailTextContainer}>
                 <Text style={styles.detailLabel}>Tipo de Emergencia</Text>
-                <Text style={styles.detailValue}>{emergencyDetails?.tipo || 'No especificado'}</Text>
+                <Text style={styles.detailValue}>{emergencyDetails?.emergencyType || 'No especificado'}</Text>
               </View>
             </View>
 
@@ -358,8 +422,27 @@ const EmergencyTrackingScreen = ({ route, navigation }) => {
               <View style={styles.detailTextContainer}>
                 <Text style={styles.detailLabel}>Descripción Adicional</Text>
                 <Text style={[styles.detailValue, styles.descriptionText]}>
-                  {emergencyDetails?.descripcion || 'No especificada'}
+                  {emergencyDetails?.additionalInfo || 'No especificada'}
                 </Text>
+              </View>
+            </View>
+
+            <View style={styles.sectionDivider} />
+            <Text style={styles.subSectionTitle}>Información del Seguro</Text>
+
+            <View style={styles.detailRow}>
+              <Icon name="shield" type="font-awesome" color="#757575" size={20} />
+              <View style={styles.detailTextContainer}>
+                <Text style={styles.detailLabel}>Seguro Médico</Text>
+                <Text style={styles.detailValue}>{emergencyDetails?.insurance || 'No especificado'}</Text>
+              </View>
+            </View>
+
+            <View style={styles.detailRow}>
+              <Icon name="id-card" type="font-awesome" color="#757575" size={20} />
+              <View style={styles.detailTextContainer}>
+                <Text style={styles.detailLabel}>Número de Póliza</Text>
+                <Text style={styles.detailValue}>{emergencyDetails?.policyNumber || 'No especificado'}</Text>
               </View>
             </View>
           </View>
@@ -696,6 +779,17 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18,
     marginTop: 2,
+  },
+  sectionDivider: {
+    height: 1,
+    backgroundColor: '#eee',
+    marginVertical: 15,
+  },
+  subSectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#0288D1',
+    marginBottom: 10,
   },
 });
 

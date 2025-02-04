@@ -54,6 +54,7 @@ const EmergencyMapScreen = ({ navigation, route }) => {
   const [loading, setLoading] = useState(true);
   const [followsUserLocation, setFollowsUserLocation] = useState(true);
   const [selectedService, setSelectedService] = useState(null);
+  const [formDataReceived, setFormDataReceived] = useState(false);
 
   // Función para obtener la dirección de una ubicación
   const getAddressFromCoords = async (coords) => {
@@ -176,6 +177,12 @@ const EmergencyMapScreen = ({ navigation, route }) => {
     getLocation();
   }, []);
 
+  useEffect(() => {
+    if (route.params?.formData) {
+      setFormDataReceived(true);
+    }
+  }, [route.params]);
+
   const handleSearch = async (text) => {
     setSearchQuery(text);
     if (text.length > 3) {
@@ -270,23 +277,15 @@ const EmergencyMapScreen = ({ navigation, route }) => {
     setSelectedService(service);
   };
 
-  const handleConfirmLocation = () => {
-    if (!selectedLocation) {
-      alert('Por favor selecciona una ubicación');
-      return;
+  const handleContinue = () => {
+    if (selectedLocation && selectedAddress) {
+      navigation.navigate('EmergencyTracking', {
+        selectedLocation,
+        selectedAddress,
+        userLocation: location,
+        emergencyDetails: route.params?.formData || {}
+      });
     }
-
-    if (!selectedService) {
-      alert('Por favor selecciona un tipo de servicio');
-      return;
-    }
-    
-    navigation.navigate('EmergencyTracking', {
-      selectedLocation,
-      selectedAddress,
-      userLocation: location,
-      selectedService
-    });
   };
 
   const renderSearchResult = ({ item }) => (
@@ -379,7 +378,7 @@ const EmergencyMapScreen = ({ navigation, route }) => {
               key={service.id} 
               style={[
                 styles.serviceCard,
-                selectedService?.id === service.id && styles.selectedServiceCard
+                selectedService?.id === service.id && {backgroundColor: service.color}
               ]}
               onPress={() => handleServiceSelect(service)}
             >
@@ -406,7 +405,7 @@ const EmergencyMapScreen = ({ navigation, route }) => {
           styles.floatingButton,
           !selectedService && styles.floatingButtonDisabled
         ]}
-        onPress={handleConfirmLocation}
+        onPress={handleContinue}
       >
         <Text style={styles.floatingButtonText}>
           {selectedService 
@@ -419,7 +418,22 @@ const EmergencyMapScreen = ({ navigation, route }) => {
         style={styles.myLocationButton}
         onPress={handleMyLocationPress}
       >
-        <Icon name="my-location" type="material" color="#333" size={24} />
+        <Icon name="my-location" type="material" color="#0288D1" size={24} />
+      </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={[
+          styles.formButton,
+          formDataReceived && styles.formButtonSaved
+        ]}
+        onPress={() => navigation.navigate('EmergencyForm')}
+      >
+        <Icon 
+          name="description" 
+          type="material" 
+          color={formDataReceived ? "#fff" : "#A0522D"} 
+          size={24} 
+        />
       </TouchableOpacity>
     </View>
   );
@@ -545,7 +559,7 @@ const styles = StyleSheet.create({
     bottom: 30,
     left: 20,
     right: 20,
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#4CAF50',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
@@ -594,9 +608,6 @@ const styles = StyleSheet.create({
   resultsList: {
     padding: 12,
   },
-  selectedServiceCard: {
-    backgroundColor: '#e74c3c',
-  },
   selectedServiceText: {
     color: '#fff',
     fontWeight: 'bold',
@@ -622,6 +633,28 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+  formButton: {
+    position: 'absolute',
+    right: 16,
+    bottom: 160,
+    backgroundColor: '#fff',
+    borderRadius: 30,
+    width: 50,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  formButtonSaved: {
+    backgroundColor: '#9E9E9E',
   },
 });
 
