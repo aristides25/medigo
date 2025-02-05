@@ -1,193 +1,273 @@
 import React from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
-import { Text, Avatar, Icon } from '@rneui/themed';
+import { View, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { Text } from '@rneui/themed';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { COLORS } from '../constants';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const ProfileScreen = ({ navigation }) => {
-  const userData = {
-    name: 'Juan Pérez',
-    email: 'juan.perez@email.com',
+const ProfileScreen = () => {
+  const userInfo = {
+    name: 'José Daniel',
+    email: 'jose.daniel@email.com',
     phone: '+507 6123-4567',
-    birthDate: '15/05/1985',
     bloodType: 'O+',
-    address: 'Calle 50, Ciudad de Panamá',
-    emergencyContact: 'María Pérez',
-    emergencyPhone: '+507 6789-0123',
-    insurance: 'Seguro Médico Nacional',
-    policyNumber: 'POL-123456'
+    weight: '75 kg',
+    height: '175 cm',
   };
 
-  const renderInfoItem = (icon, title, value) => (
-    <View style={styles.infoItem}>
-      <Icon name={icon} type="material" color="#0288D1" size={24} style={styles.icon} />
-      <View style={styles.infoContent}>
-        <Text style={styles.infoLabel}>{title}</Text>
-        <Text style={styles.infoValue}>{value}</Text>
+  const renderProfileItem = (icon, title, value) => (
+    <View style={styles.profileItem}>
+      <View style={styles.profileIconContainer}>
+        <Icon name={icon} size={24} color={COLORS.lightBlue} />
+      </View>
+      <View style={styles.profileContent}>
+        <Text style={styles.profileLabel}>{title}</Text>
+        <Text style={styles.profileValue}>{value}</Text>
       </View>
     </View>
   );
 
   return (
-    <View style={styles.container}>
-      <ScrollView style={styles.scrollContainer}>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView style={styles.container}>
         <View style={styles.header}>
-          <Avatar
-            size={100}
-            rounded
-            title="JP"
-            containerStyle={styles.avatar}
-            titleStyle={{ color: 'white' }}
-          />
-          <Text style={styles.name}>{userData.name}</Text>
-          <Text style={styles.email}>{userData.email}</Text>
+          <Text style={styles.headerTitle}>Mi Perfil</Text>
+        </View>
+
+        <View style={styles.profileCard}>
+          <View style={styles.avatarContainer}>
+            <Image
+              source={require('../assets/icon.png')}
+              style={styles.avatar}
+            />
+            <TouchableOpacity style={styles.editAvatarButton}>
+              <Icon name="camera" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.userName}>{userInfo.name}</Text>
+          <Text style={styles.userEmail}>{userInfo.email}</Text>
+          <TouchableOpacity style={styles.editProfileButton}>
+            <Text style={styles.editProfileText}>Editar Perfil</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Información Personal</Text>
-          {renderInfoItem('phone', 'Teléfono', userData.phone)}
-          {renderInfoItem('cake', 'Fecha de Nacimiento', userData.birthDate)}
-          {renderInfoItem('opacity', 'Tipo de Sangre', userData.bloodType)}
-          {renderInfoItem('place', 'Dirección', userData.address)}
+          {renderProfileItem('phone', 'Teléfono', userInfo.phone)}
+          {renderProfileItem('water', 'Tipo de Sangre', userInfo.bloodType)}
+          {renderProfileItem('weight', 'Peso', userInfo.weight)}
+          {renderProfileItem('human-male-height', 'Altura', userInfo.height)}
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Contacto de Emergencia</Text>
-          {renderInfoItem('person', 'Nombre', userData.emergencyContact)}
-          {renderInfoItem('phone', 'Teléfono', userData.emergencyPhone)}
-        </View>
+          <Text style={styles.sectionTitle}>Historial Médico</Text>
+          <TouchableOpacity style={styles.medicalItem}>
+            <View style={styles.profileIconContainer}>
+              <Icon name="file-document-outline" size={24} color={COLORS.lightBlue} />
+            </View>
+            <View style={styles.profileContent}>
+              <Text style={styles.medicalTitle}>Historial de Consultas</Text>
+              <Text style={styles.medicalDescription}>Ver todas tus consultas anteriores</Text>
+            </View>
+            <Icon name="chevron-right" size={24} color="#666" />
+          </TouchableOpacity>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Información de Seguro</Text>
-          {renderInfoItem('health-and-safety', 'Seguro', userData.insurance)}
-          {renderInfoItem('badge', 'Número de Póliza', userData.policyNumber)}
+          <TouchableOpacity style={styles.medicalItem}>
+            <View style={styles.profileIconContainer}>
+              <Icon name="pill" size={24} color={COLORS.lightBlue} />
+            </View>
+            <View style={styles.profileContent}>
+              <Text style={styles.medicalTitle}>Medicamentos</Text>
+              <Text style={styles.medicalDescription}>Tus medicamentos actuales</Text>
+            </View>
+            <Icon name="chevron-right" size={24} color="#666" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.medicalItem}>
+            <View style={styles.profileIconContainer}>
+              <Icon name="clipboard-text-outline" size={24} color={COLORS.lightBlue} />
+            </View>
+            <View style={styles.profileContent}>
+              <Text style={styles.medicalTitle}>Resultados de Laboratorio</Text>
+              <Text style={styles.medicalDescription}>Ver tus resultados médicos</Text>
+            </View>
+            <Icon name="chevron-right" size={24} color="#666" />
+          </TouchableOpacity>
         </View>
       </ScrollView>
-
-      <View style={styles.navbar}>
-        <View style={styles.navItem}>
-          <Icon
-            name="home"
-            type="material"
-            size={28}
-            color="#666"
-            onPress={() => navigation.navigate('Home')}
-          />
-          <Text style={styles.navText}>Inicio</Text>
-        </View>
-        
-        <View style={styles.navItem}>
-          <Icon
-            name="person"
-            type="material"
-            size={28}
-            color="#FFD700"
-            onPress={() => navigation.navigate('Profile')}
-          />
-          <Text style={[styles.navText, styles.activeNavText]}>Perfil</Text>
-        </View>
-
-        <View style={styles.navItem}>
-          <Icon
-            name="settings"
-            type="material"
-            size={28}
-            color="#666"
-            onPress={() => navigation.navigate('Settings')}
-          />
-          <Text style={styles.navText}>Configuración</Text>
-        </View>
-      </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.lightestBlue,
+  },
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-  },
-  scrollContainer: {
-    flex: 1,
+    padding: 20,
   },
   header: {
-    alignItems: 'center',
+    marginBottom: 20,
+    backgroundColor: COLORS.lightBlue,
     padding: 20,
-    backgroundColor: '#f5f5f5',
+    borderRadius: 25,
+    shadowColor: COLORS.darkBlue,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  headerTitle: {
+    fontSize: 26,
+    fontWeight: '800',
+    color: '#fff',
+    textShadowColor: 'rgba(0, 0, 0, 0.15)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
+    letterSpacing: 0.5,
+  },
+  profileCard: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    marginBottom: 20,
+    shadowColor: COLORS.darkBlue,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  avatarContainer: {
+    position: 'relative',
+    marginBottom: 15,
   },
   avatar: {
-    backgroundColor: '#0288D1',
-    marginBottom: 10,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 3,
+    borderColor: COLORS.lightBlue,
   },
-  name: {
+  editAvatarButton: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    backgroundColor: COLORS.lightBlue,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  userName: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: '700',
+    color: '#2A2A2A',
+    marginBottom: 5,
+    letterSpacing: 0.3,
   },
-  email: {
+  userEmail: {
     fontSize: 16,
     color: '#666',
-    marginTop: 5,
+    marginBottom: 15,
+    letterSpacing: 0.2,
+  },
+  editProfileButton: {
+    backgroundColor: COLORS.lightestBlue,
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: COLORS.lightBlue,
+  },
+  editProfileText: {
+    color: COLORS.darkBlue,
+    fontSize: 14,
+    fontWeight: '600',
+    letterSpacing: 0.2,
   },
   section: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 15,
+    marginBottom: 20,
+    shadowColor: COLORS.darkBlue,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: '700',
+    color: '#2A2A2A',
     marginBottom: 15,
+    paddingLeft: 5,
+    letterSpacing: 0.3,
   },
-  infoItem: {
+  profileItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 15,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0, 0, 0, 0.05)',
   },
-  icon: {
+  profileIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.lightestBlue,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 15,
   },
-  infoContent: {
+  profileContent: {
     flex: 1,
   },
-  infoLabel: {
+  profileLabel: {
     fontSize: 14,
     color: '#666',
+    marginBottom: 2,
+    letterSpacing: 0.2,
   },
-  infoValue: {
+  profileValue: {
     fontSize: 16,
-    color: '#333',
-    marginTop: 2,
+    fontWeight: '600',
+    color: '#2A2A2A',
+    letterSpacing: 0.2,
   },
-  navbar: {
+  medicalItem: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: -2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0, 0, 0, 0.05)',
   },
-  navItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 5,
+  medicalTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2A2A2A',
+    marginBottom: 2,
+    letterSpacing: 0.2,
   },
-  navText: {
-    fontSize: 12,
+  medicalDescription: {
+    fontSize: 13,
     color: '#666',
-    marginTop: 4,
-  },
-  activeNavText: {
-    color: '#FFD700',
-    fontWeight: 'bold',
+    letterSpacing: 0.2,
   },
 });
 
