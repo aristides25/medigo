@@ -15,9 +15,9 @@ const HomeScreen = ({ navigation }) => {
   // Definir los módulos disponibles para búsqueda
   const modules = [
     { 
-      name: 'Clínica Virtual', 
-      route: 'TelemedicineHome',
-      keywords: ['virtual', 'clinica', 'online', 'consulta virtual']
+      name: 'Farmacia', 
+      route: 'Pharmacy',
+      keywords: ['farmacia', 'medicamentos', 'medicina', 'drogueria']
     },
     { 
       name: 'Citas Presenciales', 
@@ -65,37 +65,42 @@ const HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     let locationSubscription;
+    let isMounted = true;
     
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        setLocationText('Permiso de ubicación denegado');
+        if (isMounted) setLocationText('Permiso de ubicación denegado');
         return;
       }
 
       try {
         let location = await Location.getCurrentPositionAsync({});
-        setLocation(location);
-        
-        // Obtener dirección a partir de coordenadas
-        let address = await Location.reverseGeocodeAsync({
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude
-        });
+        if (isMounted) {
+          setLocation(location);
+          
+          // Obtener dirección a partir de coordenadas
+          let address = await Location.reverseGeocodeAsync({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude
+          });
 
-        if (address && address[0]) {
-          const addr = address[0];
-          setLocationText(`${addr.street || ''} ${addr.name || ''}, ${addr.city || ''}`);
+          if (address && address[0] && isMounted) {
+            const addr = address[0];
+            setLocationText(`${addr.street || ''} ${addr.name || ''}, ${addr.city || ''}`);
+          }
         }
 
         // Iniciar la suscripción después de obtener la ubicación inicial
-        const subscription = await Location.watchPositionAsync(
+        locationSubscription = await Location.watchPositionAsync(
           {
             accuracy: Location.Accuracy.High,
-            timeInterval: 5000,
-            distanceInterval: 10
+            timeInterval: 10000, // Aumentado a 10 segundos
+            distanceInterval: 50  // Aumentado a 50 metros
           },
           async (newLocation) => {
+            if (!isMounted) return;
+            
             setLocation(newLocation);
             try {
               let address = await Location.reverseGeocodeAsync({
@@ -103,7 +108,7 @@ const HomeScreen = ({ navigation }) => {
                 longitude: newLocation.coords.longitude
               });
 
-              if (address && address[0]) {
+              if (address && address[0] && isMounted) {
                 const addr = address[0];
                 setLocationText(`${addr.street || ''} ${addr.name || ''}, ${addr.city || ''}`);
               }
@@ -112,19 +117,18 @@ const HomeScreen = ({ navigation }) => {
             }
           }
         );
-        
-        locationSubscription = subscription;
       } catch (error) {
-        setLocationText('No se pudo obtener la ubicación');
+        if (isMounted) setLocationText('No se pudo obtener la ubicación');
       }
     })();
 
     return () => {
+      isMounted = false;
       if (locationSubscription) {
         locationSubscription.remove();
       }
     };
-  }, []);
+  }, []); // Solo se ejecuta una vez al montar el componente
 
   // Simulamos que no hay cita (esto después se conectará con los datos reales)
   const proximaCita = null; // Aquí vendría la próxima cita desde tu backend
@@ -239,15 +243,15 @@ const HomeScreen = ({ navigation }) => {
 
           {/* Grid de servicios */}
           <View style={styles.servicesGrid}>
-            {/* Clínica Virtual */}
+            {/* Farmacia */}
             <TouchableOpacity 
               style={styles.serviceCard} 
-              onPress={() => navigation.navigate('TelemedicineHome')}
+              onPress={() => navigation.navigate('Pharmacy')}
             >
               <View style={styles.iconContainer}>
-                <Icon name="video" size={24} color={COLORS.lightBlue} />
+                <Icon name="pharmacy" size={24} color={COLORS.lightBlue} />
               </View>
-              <Text style={styles.serviceText}>Clínica Virtual</Text>
+              <Text style={styles.serviceText}>Farmacia</Text>
             </TouchableOpacity>
 
             {/* Citas Médicas */}
