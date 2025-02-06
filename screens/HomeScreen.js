@@ -1,10 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, TouchableOpacity, TextInput, Image } from 'react-native';
-import { Text } from '@rneui/themed';
+import { View, StyleSheet, TouchableOpacity, TextInput, Image, ScrollView } from 'react-native';
+import { Text, Icon } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS } from '../constants';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as Location from 'expo-location';
+
+// Definimos los colores del tema
+const THEME_COLORS = {
+  primary: '#4facfe',
+  secondary: '#00f2fe',
+  background: '#f8fafc',
+  white: '#ffffff',
+  black: '#2d3748',
+  grey0: '#718096',
+  grey1: '#e2e8f0',
+  lightBlue: '#4facfe',
+  darkBlue: '#2d3748',
+  lightestBlue: '#E8F4F8'
+};
 
 const HomeScreen = ({ navigation }) => {
   const [location, setLocation] = useState(null);
@@ -156,10 +169,10 @@ const HomeScreen = ({ navigation }) => {
         onPress={() => navigation.navigate('Appointments')}
       >
         <View style={[styles.iconContainer, { marginRight: 15 }]}>
-          <Icon name="calendar-plus" size={24} color={COLORS.lightBlue} />
+          <Icon name="calendar-plus" size={24} color={THEME_COLORS.primary} />
         </View>
         <View style={styles.appointmentInfo}>
-          <Text style={[styles.doctorName, { color: COLORS.darkBlue }]}>¿Necesitas una cita médica?</Text>
+          <Text style={[styles.doctorName, { color: THEME_COLORS.darkBlue }]}>¿Necesitas una cita médica?</Text>
           <Text style={styles.appointmentTime}>Toca aquí para agendar</Text>
         </View>
         <Icon name="chevron-right" size={24} color="#666" />
@@ -167,10 +180,60 @@ const HomeScreen = ({ navigation }) => {
     );
   };
 
+  const menuItems = [
+    {
+      id: 1,
+      title: 'Telemedicina',
+      description: 'Consultas médicas en línea',
+      icon: 'video',
+      route: 'TelemedicineHome',
+      gradient: ['#4facfe', '#00f2fe'],
+    },
+    {
+      id: 2,
+      title: 'Citas Médicas',
+      description: 'Agenda tu cita presencial',
+      icon: 'calendar-clock',
+      route: 'Appointments',
+      gradient: ['#6a11cb', '#2575fc'],
+    },
+    {
+      id: 3,
+      title: 'Farmacia',
+      description: 'Medicamentos y productos',
+      icon: 'pharmacy',
+      route: 'Pharmacy',
+      gradient: ['#1d976c', '#93f9b9'],
+    },
+    {
+      id: 4,
+      title: 'Emergencias',
+      description: 'Servicio de ambulancia',
+      icon: 'ambulance',
+      route: 'EmergencyType',
+      gradient: ['#eb3349', '#f45c43'],
+    },
+    {
+      id: 5,
+      title: 'Enfermería',
+      description: 'Cuidados a domicilio',
+      icon: 'doctor',
+      route: 'NursingHome',
+      gradient: ['#4776E6', '#8E54E9'],
+    },
+    {
+      id: 6,
+      title: 'Expediente Médico',
+      description: 'Tu historial médico',
+      icon: 'folder-account',
+      route: 'MedicalRecords',
+      gradient: ['#11998e', '#38ef7d'],
+    },
+  ];
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* Contenido existente */}
         <View style={styles.content}>
           {/* Header con saludo */}
           <View style={styles.header}>
@@ -182,13 +245,13 @@ const HomeScreen = ({ navigation }) => {
 
           {/* Ubicación en tiempo real */}
           <View style={styles.locationBar}>
-            <Icon name="map-marker" size={24} color={COLORS.lightBlue} />
+            <Icon name="map-marker" type="material-community" size={24} color={THEME_COLORS.primary} />
             <Text style={styles.locationText} numberOfLines={1} ellipsizeMode="tail">
               {locationText}
             </Text>
             {location && (
               <View style={styles.locationPulse}>
-                <Icon name="circle" size={8} color={COLORS.lightBlue} />
+                <Icon name="circle" type="material-community" size={8} color={THEME_COLORS.primary} />
               </View>
             )}
           </View>
@@ -196,7 +259,7 @@ const HomeScreen = ({ navigation }) => {
           {/* Barra de búsqueda mejorada */}
           <View style={styles.searchContainer}>
             <View style={styles.searchBar}>
-              <Icon name="magnify" size={24} color={COLORS.lightBlue} />
+              <Icon name="magnify" type="material-community" size={24} color={THEME_COLORS.primary} />
               <TextInput
                 style={styles.searchInput}
                 placeholder="Buscar por especialidad o servicio"
@@ -214,7 +277,7 @@ const HomeScreen = ({ navigation }) => {
                     setShowResults(false);
                   }}
                 >
-                  <Icon name="close" size={20} color="#666" />
+                  <Icon name="close" type="material-community" size={20} color="#666" />
                 </TouchableOpacity>
               ) : null}
             </View>
@@ -229,7 +292,7 @@ const HomeScreen = ({ navigation }) => {
                     onPress={() => handleModuleSelect(module.route)}
                   >
                     <Text style={styles.searchResultText}>{module.name}</Text>
-                    <Icon name="chevron-right" size={20} color="#666" />
+                    <Icon name="chevron-right" type="material-community" size={20} color="#666" />
                   </TouchableOpacity>
                 ))}
                 {getFilteredModules().length === 0 && searchText && (
@@ -249,7 +312,7 @@ const HomeScreen = ({ navigation }) => {
               onPress={() => navigation.navigate('Pharmacy')}
             >
               <View style={styles.iconContainer}>
-                <Icon name="pharmacy" size={24} color={COLORS.lightBlue} />
+                <Icon name="pharmacy" type="material-community" size={24} color={THEME_COLORS.primary} />
               </View>
               <Text style={styles.serviceText}>Farmacia</Text>
             </TouchableOpacity>
@@ -260,7 +323,7 @@ const HomeScreen = ({ navigation }) => {
               onPress={() => navigation.navigate('Appointments')}
             >
               <View style={styles.iconContainer}>
-                <Icon name="hospital-building" size={24} color={COLORS.lightBlue} />
+                <Icon name="hospital-building" type="material-community" size={24} color={THEME_COLORS.primary} />
               </View>
               <Text style={styles.serviceText}>Citas Presenciales</Text>
             </TouchableOpacity>
@@ -271,7 +334,7 @@ const HomeScreen = ({ navigation }) => {
               onPress={() => navigation.navigate('TelemedicineHome')}
             >
               <View style={styles.iconContainer}>
-                <Icon name="phone-plus" size={24} color={COLORS.lightBlue} />
+                <Icon name="phone-plus" type="material-community" size={24} color={THEME_COLORS.primary} />
               </View>
               <Text style={styles.serviceText}>Telemedicina</Text>
             </TouchableOpacity>
@@ -282,18 +345,18 @@ const HomeScreen = ({ navigation }) => {
               onPress={() => navigation.navigate('NursingHome')}
             >
               <View style={styles.iconContainer}>
-                <Icon name="baby-face-outline" size={24} color={COLORS.lightBlue} />
+                <Icon name="baby-face-outline" type="material-community" size={24} color={THEME_COLORS.primary} />
               </View>
               <Text style={styles.serviceText}>Servicios de Fertilidad</Text>
             </TouchableOpacity>
 
-            {/* Ambulancia - reemplazando Salud General */}
+            {/* Ambulancia */}
             <TouchableOpacity 
               style={styles.serviceCard} 
               onPress={() => navigation.navigate('EmergencyMap')}
             >
               <View style={styles.iconContainer}>
-                <Icon name="ambulance" size={24} color={COLORS.lightBlue} />
+                <Icon name="ambulance" type="material-community" size={24} color={THEME_COLORS.primary} />
               </View>
               <Text style={styles.serviceText}>Ambulancia</Text>
             </TouchableOpacity>
@@ -304,7 +367,7 @@ const HomeScreen = ({ navigation }) => {
               onPress={() => navigation.navigate('MedicalRecords')}
             >
               <View style={styles.iconContainer}>
-                <Icon name="account" size={24} color={COLORS.lightBlue} />
+                <Icon name="account" type="material-community" size={24} color={THEME_COLORS.primary} />
               </View>
               <Text style={styles.serviceText}>Portal del Paciente</Text>
             </TouchableOpacity>
@@ -317,15 +380,15 @@ const HomeScreen = ({ navigation }) => {
             style={styles.navItem} 
             onPress={() => {}}  // Inicio - ya estamos aquí
           >
-            <Icon name="home" size={24} color={COLORS.lightBlue} />
-            <Text style={[styles.navText, { color: COLORS.lightBlue }]}>Inicio</Text>
+            <Icon name="home" type="material-community" size={24} color={THEME_COLORS.primary} />
+            <Text style={[styles.navText, { color: THEME_COLORS.primary }]}>Inicio</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
             style={styles.navItem} 
             onPress={() => navigation.navigate('Settings')}
           >
-            <Icon name="cog" size={24} color="#666" />
+            <Icon name="cog" type="material-community" size={24} color="#666" />
             <Text style={styles.navText}>Configuración</Text>
           </TouchableOpacity>
 
@@ -333,7 +396,7 @@ const HomeScreen = ({ navigation }) => {
             style={styles.navItem} 
             onPress={() => navigation.navigate('Profile')}
           >
-            <Icon name="account" size={24} color="#666" />
+            <Icon name="account" type="material-community" size={24} color="#666" />
             <Text style={styles.navText}>Perfil</Text>
           </TouchableOpacity>
         </View>
@@ -345,9 +408,9 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: COLORS.lightestBlue,
+    backgroundColor: THEME_COLORS.lightestBlue,
     height: '100%',
-    paddingTop: 50,
+    paddingTop: 5,
   },
   container: {
     flex: 1,
@@ -364,10 +427,10 @@ const styles = StyleSheet.create({
   header: {
     marginTop: 0,
     marginBottom: 15,
-    backgroundColor: COLORS.lightBlue,
+    backgroundColor: THEME_COLORS.primary,
     padding: 18,
     borderRadius: 25,
-    shadowColor: COLORS.darkBlue,
+    shadowColor: THEME_COLORS.darkBlue,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.25,
     shadowRadius: 10,
@@ -378,7 +441,7 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 26,
     fontWeight: '800',
-    color: '#fff',
+    color: THEME_COLORS.white,
     textShadowColor: 'rgba(0, 0, 0, 0.15)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
@@ -391,7 +454,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 20,
     marginBottom: 15,
-    shadowColor: COLORS.darkBlue,
+    shadowColor: THEME_COLORS.darkBlue,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.15,
     shadowRadius: 12,
@@ -406,7 +469,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginRight: 15,
     borderWidth: 2,
-    borderColor: COLORS.lightBlue,
+    borderColor: THEME_COLORS.lightBlue,
   },
   appointmentInfo: {
     flex: 1,
@@ -431,7 +494,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 20,
     marginBottom: 15,
-    shadowColor: COLORS.darkBlue,
+    shadowColor: THEME_COLORS.darkBlue,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.12,
     shadowRadius: 8,
@@ -466,7 +529,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
     padding: 12,
     borderRadius: 20,
-    shadowColor: COLORS.darkBlue,
+    shadowColor: THEME_COLORS.darkBlue,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -490,7 +553,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 15,
     marginTop: 5,
-    shadowColor: COLORS.darkBlue,
+    shadowColor: THEME_COLORS.darkBlue,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -532,7 +595,7 @@ const styles = StyleSheet.create({
     padding: 12,
     alignItems: 'center',
     marginBottom: 10,
-    shadowColor: COLORS.darkBlue,
+    shadowColor: THEME_COLORS.darkBlue,
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.12,
     shadowRadius: 8,
@@ -545,11 +608,11 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.lightestBlue,
+    backgroundColor: THEME_COLORS.lightestBlue,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
-    shadowColor: COLORS.darkBlue,
+    shadowColor: THEME_COLORS.darkBlue,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.15,
     shadowRadius: 5,
@@ -601,7 +664,7 @@ const styles = StyleSheet.create({
   },
   newAppointmentCard: {
     borderStyle: 'dashed',
-    borderColor: COLORS.lightBlue,
+    borderColor: THEME_COLORS.lightBlue,
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
   },
 });

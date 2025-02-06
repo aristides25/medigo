@@ -114,10 +114,6 @@ const AppointmentsScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Mis Citas Médicas</Text>
-      </View>
-
       <ButtonGroup
         buttons={filterButtons}
         selectedIndex={filterStatus}
@@ -161,35 +157,24 @@ const AppointmentsScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    padding: 15,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#444',
+    backgroundColor: '#E8F4F8',
   },
   buttonGroupContainer: {
     marginHorizontal: 15,
-    marginVertical: 10,
+    marginVertical: 15,
     height: 40,
     borderRadius: 20,
-    borderColor: '#0077B6',
+    borderColor: '#4facfe',
   },
   selectedButton: {
-    backgroundColor: '#0077B6',
+    backgroundColor: '#4facfe',
   },
   buttonGroupText: {
-    color: '#0077B6',
+    color: '#4facfe',
     fontSize: 14,
   },
   selectedButtonText: {
-    color: '#fff',
+    color: '#ffffff',
     fontWeight: 'bold',
   },
   content: {
@@ -197,8 +182,19 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   card: {
-    borderRadius: 10,
-    marginBottom: 10,
+    borderRadius: 16,
+    marginBottom: 12,
+    padding: 15,
+    borderLeftWidth: 4,
+    borderLeftColor: '#4facfe',
+    shadowColor: '#2d3748',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   cardHeader: {
     flexDirection: 'row',
@@ -208,11 +204,12 @@ const styles = StyleSheet.create({
   doctorName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#444',
+    color: '#2d3748',
+    marginBottom: 4,
   },
   specialty: {
     fontSize: 14,
-    color: '#666',
+    color: '#718096',
     marginTop: 2,
   },
   badge: {
@@ -229,11 +226,12 @@ const styles = StyleSheet.create({
   detailText: {
     marginLeft: 10,
     fontSize: 14,
-    color: '#666',
+    color: '#718096',
   },
   detailsButton: {
-    backgroundColor: '#0077B6',
-    borderRadius: 8,
+    backgroundColor: '#4facfe',
+    borderRadius: 12,
+    paddingVertical: 12,
   },
   emptyState: {
     flex: 1,
@@ -243,14 +241,15 @@ const styles = StyleSheet.create({
   },
   emptyStateText: {
     fontSize: 16,
-    color: '#666',
+    color: '#718096',
     marginVertical: 15,
     textAlign: 'center',
   },
   newAppointmentButton: {
-    backgroundColor: '#0077B6',
+    backgroundColor: '#4facfe',
     paddingHorizontal: 30,
-    borderRadius: 25,
+    borderRadius: 12,
+    paddingVertical: 12,
   },
 });
 

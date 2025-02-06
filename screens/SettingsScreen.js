@@ -13,7 +13,7 @@ const SettingsScreen = () => {
   const renderSettingItem = (icon, title, description, value, onValueChange) => (
     <View style={styles.settingItem}>
       <View style={styles.settingIconContainer}>
-        <Icon name={icon} size={24} color={COLORS.lightBlue} />
+        <Icon name={icon} size={24} color="#4facfe" />
       </View>
       <View style={styles.settingContent}>
         <Text style={styles.settingTitle}>{title}</Text>
@@ -22,8 +22,8 @@ const SettingsScreen = () => {
       <Switch
         value={value}
         onValueChange={onValueChange}
-        trackColor={{ false: '#767577', true: COLORS.lightBlue }}
-        thumbColor={value ? COLORS.darkBlue : '#f4f3f4'}
+        trackColor={{ false: '#e2e8f0', true: '#4facfe' }}
+        thumbColor={value ? '#ffffff' : '#f4f3f4'}
       />
     </View>
   );
@@ -103,18 +103,19 @@ const SettingsScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: COLORS.lightestBlue,
+    backgroundColor: '#E8F4F8',
   },
   container: {
     flex: 1,
     padding: 20,
+    paddingTop: 5,
   },
   header: {
     marginBottom: 20,
-    backgroundColor: COLORS.lightBlue,
-    padding: 20,
+    backgroundColor: '#4facfe',
+    padding: 30,
     borderRadius: 25,
-    shadowColor: COLORS.darkBlue,
+    shadowColor: '#2d3748',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.25,
     shadowRadius: 10,
@@ -125,7 +126,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 26,
     fontWeight: '800',
-    color: '#fff',
+    color: '#ffffff',
     textShadowColor: 'rgba(0, 0, 0, 0.15)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
@@ -133,10 +134,10 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: 25,
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffff',
     borderRadius: 20,
     padding: 15,
-    shadowColor: COLORS.darkBlue,
+    shadowColor: '#2d3748',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -147,7 +148,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#2A2A2A',
+    color: '#2d3748',
     marginBottom: 15,
     paddingLeft: 5,
     letterSpacing: 0.3,
@@ -163,7 +164,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: COLORS.lightestBlue,
+    backgroundColor: '#E8F4F8',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 15,
@@ -174,12 +175,12 @@ const styles = StyleSheet.create({
   settingTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#2A2A2A',
+    color: '#2d3748',
     marginBottom: 2,
   },
   settingDescription: {
     fontSize: 13,
-    color: '#666',
+    color: '#718096',
     letterSpacing: 0.2,
   },
 });

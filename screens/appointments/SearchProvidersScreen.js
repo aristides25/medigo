@@ -145,7 +145,7 @@ const SearchProvidersScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+      <View style={styles.searchBarContainer}>
         <SearchBar
           placeholder="Buscar médicos, clínicas..."
           onChangeText={updateSearch}
@@ -157,7 +157,7 @@ const SearchProvidersScreen = ({ navigation }) => {
           round
           showLoading={loading}
           cancelButtonTitle="Cancelar"
-          cancelButtonProps={{ color: '#0077B6' }}
+          cancelButtonProps={{ color: '#4facfe' }}
         />
       </View>
 
@@ -172,7 +172,7 @@ const SearchProvidersScreen = ({ navigation }) => {
         buttonContainerStyle={styles.buttonContainer}
       />
 
-      {loading && <LinearProgress color="#0077B6" style={styles.progress} />}
+      {loading && <LinearProgress color="#4facfe" style={styles.progress} />}
 
       <ScrollView style={styles.content}>
         <Text style={styles.resultsText}>
@@ -193,42 +193,53 @@ const SearchProvidersScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#E8F4F8',
   },
-  header: {
-    backgroundColor: '#fff',
+  searchBarContainer: {
+    backgroundColor: '#ffffff',
+    paddingVertical: 15,
+    paddingTop: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: 'rgba(0, 0, 0, 0.05)',
+    shadowColor: '#2d3748',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   searchContainer: {
     backgroundColor: 'transparent',
     borderTopWidth: 0,
     borderBottomWidth: 0,
     paddingHorizontal: 15,
-    paddingVertical: 10,
+    paddingVertical: 0,
   },
   searchInputContainer: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    height: 45,
   },
   buttonGroupContainer: {
     marginHorizontal: 15,
     marginVertical: 10,
     height: 40,
     borderRadius: 20,
-    borderColor: '#0077B6',
+    borderColor: '#4facfe',
   },
   buttonContainer: {
     borderRadius: 20,
   },
   selectedButton: {
-    backgroundColor: '#0077B6',
+    backgroundColor: '#4facfe',
   },
   buttonGroupText: {
-    color: '#0077B6',
+    color: '#4facfe',
     fontSize: 14,
   },
   selectedButtonText: {
-    color: '#fff',
+    color: '#ffffff',
     fontWeight: 'bold',
   },
   progress: {
@@ -240,12 +251,23 @@ const styles = StyleSheet.create({
   },
   resultsText: {
     fontSize: 14,
-    color: '#666',
+    color: '#718096',
     marginBottom: 15,
   },
   card: {
-    borderRadius: 10,
-    marginBottom: 10,
+    borderRadius: 16,
+    marginBottom: 12,
+    padding: 15,
+    borderLeftWidth: 4,
+    borderLeftColor: '#4facfe',
+    shadowColor: '#2d3748',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   cardHeader: {
     flexDirection: 'row',
@@ -258,13 +280,14 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   providerName: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#444',
+    color: '#2d3748',
+    marginBottom: 4,
   },
   specialty: {
     fontSize: 14,
-    color: '#666',
+    color: '#718096',
     marginTop: 2,
   },
   ratingContainer: {
@@ -276,23 +299,24 @@ const styles = StyleSheet.create({
   },
   reviewCount: {
     fontSize: 12,
-    color: '#666',
+    color: '#718096',
     marginTop: 2,
   },
   address: {
     fontSize: 14,
-    color: '#666',
+    color: '#718096',
     marginBottom: 5,
   },
   availability: {
     fontSize: 14,
-    color: '#4CAF50',
+    color: '#4facfe',
     marginBottom: 10,
   },
   selectButton: {
-    backgroundColor: '#0077B6',
-    borderRadius: 8,
+    backgroundColor: '#4facfe',
+    borderRadius: 12,
     marginTop: 5,
+    paddingVertical: 12,
   },
 });
 

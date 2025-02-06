@@ -7,39 +7,21 @@ import MapView, { Marker } from 'react-native-maps';
 const services = [
   {
     id: 1,
-    title: 'Ambulancia Básica',
+    title: 'Ambulancia Emergencia',
     icon: 'ambulance',
     color: '#e74c3c'
   },
   {
     id: 2,
-    title: 'Ambulancia UTI',
-    icon: 'heartbeat',
-    color: '#c0392b'
-  },
-  {
-    id: 3,
-    title: 'Traslado Programado',
-    icon: 'calendar',
+    title: 'Traslado',
+    icon: 'hospital-o',
     color: '#3498db'
   },
   {
-    id: 4,
-    title: 'Traslado Interhospitalario',
-    icon: 'hospital-o',
-    color: '#2980b9'
-  },
-  {
-    id: 5,
-    title: 'Emergencia Crítica',
+    id: 3,
+    title: 'Accidente',
     icon: 'medkit',
     color: '#e67e22'
-  },
-  {
-    id: 6,
-    title: 'Cuidados Intensivos',
-    icon: 'user-md',
-    color: '#d35400'
   }
 ];
 
@@ -114,10 +96,8 @@ const EmergencyMapScreen = ({ navigation, route }) => {
           return;
         }
 
-        // Configurar la precisión máxima
         await Location.enableNetworkProviderAsync();
         
-        // Obtener ubicación con máxima precisión
         let preciseLocation = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.BestForNavigation,
           maximumAge: 0,
@@ -143,29 +123,6 @@ const EmergencyMapScreen = ({ navigation, route }) => {
         const address = await getAddressFromCoords(coords);
         setSelectedAddress(address);
         setSearchQuery(address);
-
-        // Configurar actualización en tiempo real con máxima precisión
-        const locationSubscription = await Location.watchPositionAsync(
-          {
-            accuracy: Location.Accuracy.BestForNavigation,
-            timeInterval: 2000,
-            distanceInterval: 1,
-          },
-          (newLocation) => {
-            const updatedCoords = {
-              latitude: newLocation.coords.latitude,
-              longitude: newLocation.coords.longitude,
-            };
-            setLocation(updatedCoords);
-          }
-        );
-
-        return () => {
-          if (locationSubscription) {
-            locationSubscription.remove();
-          }
-        };
-
       } catch (error) {
         console.error('Error configurando ubicación:', error);
         alert('Error al obtener la ubicación. Por favor, verifica que el GPS esté activado.');
@@ -178,10 +135,47 @@ const EmergencyMapScreen = ({ navigation, route }) => {
   }, []);
 
   useEffect(() => {
+    let locationSubscription;
+    
+    const startLocationUpdates = async () => {
+      try {
+        locationSubscription = await Location.watchPositionAsync(
+          {
+            accuracy: Location.Accuracy.BestForNavigation,
+            timeInterval: 2000,
+            distanceInterval: 1,
+          },
+          (newLocation) => {
+            const updatedCoords = {
+              latitude: newLocation.coords.latitude,
+              longitude: newLocation.coords.longitude,
+            };
+            if (followsUserLocation) {
+              setLocation(updatedCoords);
+            }
+          }
+        );
+      } catch (error) {
+        console.error('Error en la suscripción de ubicación:', error);
+      }
+    };
+
+    if (location) {
+      startLocationUpdates();
+    }
+
+    return () => {
+      if (locationSubscription) {
+        locationSubscription.remove();
+      }
+    };
+  }, [location, followsUserLocation]);
+
+  useEffect(() => {
     if (route.params?.formData) {
       setFormDataReceived(true);
     }
-  }, [route.params]);
+  }, [route.params?.formData]);
 
   const handleSearch = async (text) => {
     setSearchQuery(text);

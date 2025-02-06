@@ -184,11 +184,19 @@ const AppointmentDetailScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#E8F4F8',
   },
   statusContainer: {
     alignItems: 'center',
     marginBottom: 20,
+    backgroundColor: '#ffffff',
+    padding: 15,
+    borderRadius: 16,
+    shadowColor: '#2d3748',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   status: {
     fontSize: 18,
@@ -196,25 +204,36 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: 20,
+    backgroundColor: '#ffffff',
+    padding: 15,
+    borderRadius: 16,
+    shadowColor: '#2d3748',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#444',
+    color: '#2d3748',
     marginBottom: 10,
   },
   providerName: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#444',
+    color: '#2d3748',
   },
   providerDetail: {
     fontSize: 16,
-    color: '#666',
+    color: '#718096',
     marginTop: 5,
   },
   divider: {
     marginVertical: 15,
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
   },
   detailRow: {
     flexDirection: 'row',
@@ -224,21 +243,21 @@ const styles = StyleSheet.create({
   detailText: {
     marginLeft: 10,
     fontSize: 16,
-    color: '#444',
+    color: '#718096',
   },
   actionsContainer: {
     marginTop: 10,
   },
   actionButton: {
     marginVertical: 5,
-    borderRadius: 8,
+    borderRadius: 12,
     paddingVertical: 12,
   },
   rescheduleButton: {
-    backgroundColor: '#0077B6',
+    backgroundColor: '#4facfe',
   },
   reviewButton: {
-    backgroundColor: '#FFC107',
+    backgroundColor: '#00f2fe',
   },
   buttonContainer: {
     marginTop: 10,

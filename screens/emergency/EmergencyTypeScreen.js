@@ -5,38 +5,24 @@ import { Button, Text, Icon } from '@rneui/themed';
 const emergencyTypes = [
   {
     id: 1,
-    title: 'Traslado Médico',
-    description: 'Traslado programado a centro médico',
+    title: 'Ambulancia Emergencia',
+    description: 'Atención inmediata para emergencias médicas',
     icon: 'ambulance',
-    color: '#4CAF50'
+    color: '#e74c3c'
   },
   {
     id: 2,
-    title: 'Accidente',
-    description: 'Atención inmediata por accidente',
-    icon: 'exclamation-triangle',
-    color: '#F44336'
+    title: 'Traslado',
+    description: 'Traslado programado a centro médico',
+    icon: 'hospital-o',
+    color: '#3498db'
   },
   {
     id: 3,
-    title: 'Emergencia Médica',
-    description: 'Atención por crisis de salud',
-    icon: 'heartbeat',
-    color: '#E91E63'
-  },
-  {
-    id: 4,
-    title: 'Alta Médica',
-    description: 'Traslado desde centro médico',
-    icon: 'hospital-o',
-    color: '#2196F3'
-  },
-  {
-    id: 5,
-    title: 'Traslado Interhospitalario',
-    description: 'Traslado entre centros médicos',
-    icon: 'exchange',
-    color: '#9C27B0'
+    title: 'Accidente',
+    description: 'Atención inmediata por accidente',
+    icon: 'medkit',
+    color: '#e67e22'
   }
 ];
 

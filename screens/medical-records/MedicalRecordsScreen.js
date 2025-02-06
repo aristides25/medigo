@@ -3,6 +3,7 @@ import { View, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } fro
 import { Text, Card, Button, Icon, Divider } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useMedicalRecord } from '../../context/MedicalRecordContext';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const MedicalRecordsScreen = ({ navigation }) => {
   const { appointments, documents, prescriptions, loading } = useMedicalRecord();
@@ -14,6 +15,7 @@ const MedicalRecordsScreen = ({ navigation }) => {
       icon: 'file-upload',
       route: 'UploadDocument',
       description: 'Añade documentos médicos a tu expediente',
+      gradient: ['#4facfe', '#00f2fe']
     },
     {
       id: 2,
@@ -21,6 +23,7 @@ const MedicalRecordsScreen = ({ navigation }) => {
       icon: 'share-variant',
       route: 'ShareRecords',
       description: 'Comparte tu expediente con proveedores médicos',
+      gradient: ['#6a11cb', '#2575fc']
     },
     {
       id: 3,
@@ -28,6 +31,7 @@ const MedicalRecordsScreen = ({ navigation }) => {
       icon: 'file-document-edit',
       route: 'DigitalPrescriptions',
       description: 'Gestiona tus recetas médicas',
+      gradient: ['#1d976c', '#93f9b9']
     },
   ];
 
@@ -38,6 +42,7 @@ const MedicalRecordsScreen = ({ navigation }) => {
       icon: 'calendar-clock',
       route: 'AppointmentHistory',
       count: appointments.length,
+      color: '#4facfe'
     },
     {
       id: 2,
@@ -45,6 +50,7 @@ const MedicalRecordsScreen = ({ navigation }) => {
       icon: 'file-document-multiple',
       route: 'MedicalDocuments',
       count: documents.length,
+      color: '#6a11cb'
     },
     {
       id: 3,
@@ -52,6 +58,7 @@ const MedicalRecordsScreen = ({ navigation }) => {
       icon: 'test-tube',
       route: 'LabResults',
       count: documents.filter(doc => doc.type === 'LAB_RESULT').length,
+      color: '#1d976c'
     },
     {
       id: 4,
@@ -59,89 +66,97 @@ const MedicalRecordsScreen = ({ navigation }) => {
       icon: 'prescription',
       route: 'PrescriptionHistory',
       count: prescriptions.length,
+      color: '#f77062'
     },
   ];
 
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0077B6" />
+        <ActivityIndicator size="large" color="#4facfe" />
+        <Text style={styles.loadingText}>Cargando tu expediente médico...</Text>
       </View>
     );
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         {/* Resumen del Expediente */}
-        <Card containerStyle={styles.summaryCard}>
+        <LinearGradient
+          colors={['#E8F4F8', '#ffffff']}
+          style={styles.headerGradient}
+        >
           <View style={styles.summaryHeader}>
             <Icon
               name="folder-account"
               type="material-community"
               size={40}
-              color="#0077B6"
+              color="#4facfe"
             />
             <Text style={styles.summaryTitle}>Tu Expediente Médico</Text>
           </View>
-          <Divider style={styles.divider} />
           <Text style={styles.lastUpdate}>
             Última actualización: {new Date().toLocaleDateString('es-ES')}
           </Text>
-        </Card>
+        </LinearGradient>
 
         {/* Acciones Rápidas */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Acciones Rápidas</Text>
-          {quickActions.map((action) => (
-            <Card key={action.id} containerStyle={styles.actionCard}>
-              <View style={styles.actionContent}>
-                <Icon
-                  name={action.icon}
-                  type="material-community"
-                  size={32}
-                  color="#0077B6"
-                />
-                <View style={styles.actionText}>
+          <View style={styles.quickActionsGrid}>
+            {quickActions.map((action) => (
+              <TouchableOpacity 
+                key={action.id}
+                style={styles.actionCard}
+                onPress={() => navigation.navigate(action.route)}
+              >
+                <LinearGradient
+                  colors={action.gradient}
+                  style={styles.actionGradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
+                  <Icon
+                    name={action.icon}
+                    type="material-community"
+                    size={32}
+                    color="#fff"
+                  />
                   <Text style={styles.actionTitle}>{action.title}</Text>
                   <Text style={styles.actionDescription}>
                     {action.description}
                   </Text>
-                </View>
-                <Button
-                  icon={{
-                    name: 'chevron-right',
-                    type: 'material-community',
-                    color: 'white',
-                  }}
-                  onPress={() => navigation.navigate(action.route)}
-                  buttonStyle={styles.actionButton}
-                />
-              </View>
-            </Card>
-          ))}
+                </LinearGradient>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
 
         {/* Secciones del Expediente */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Tu Información Médica</Text>
           {recordSections.map((section) => (
-            <Card key={section.id} containerStyle={styles.sectionCard}>
-              <TouchableOpacity
-                onPress={() => navigation.navigate(section.route)}
-                style={styles.sectionContent}
-              >
-                <View style={styles.sectionLeft}>
-                  <Icon
-                    name={section.icon}
-                    type="material-community"
-                    size={24}
-                    color="#0077B6"
-                  />
-                  <Text style={styles.sectionText}>{section.title}</Text>
-                </View>
-                <View style={styles.sectionRight}>
-                  <Text style={styles.sectionCount}>{section.count}</Text>
+            <TouchableOpacity
+              key={section.id}
+              onPress={() => navigation.navigate(section.route)}
+            >
+              <Card containerStyle={[styles.sectionCard, { borderLeftColor: section.color }]}>
+                <View style={styles.sectionContent}>
+                  <View style={styles.sectionLeft}>
+                    <View style={[styles.iconContainer, { backgroundColor: `${section.color}15` }]}>
+                      <Icon
+                        name={section.icon}
+                        type="material-community"
+                        size={24}
+                        color={section.color}
+                      />
+                    </View>
+                    <View style={styles.sectionTextContainer}>
+                      <Text style={styles.sectionText}>{section.title}</Text>
+                      <Text style={styles.sectionCount}>{section.count} registros</Text>
+                    </View>
+                  </View>
                   <Icon
                     name="chevron-right"
                     type="material-community"
@@ -149,8 +164,8 @@ const MedicalRecordsScreen = ({ navigation }) => {
                     color="#666"
                   />
                 </View>
-              </TouchableOpacity>
-            </Card>
+              </Card>
+            </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
@@ -161,18 +176,32 @@ const MedicalRecordsScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f8fafc',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f8fafc',
   },
-  summaryCard: {
-    borderRadius: 10,
-    marginBottom: 15,
-    padding: 15,
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#4a5568',
+  },
+  headerGradient: {
+    padding: 20,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    marginBottom: 20,
+    shadowColor: '#4facfe',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
   },
   summaryHeader: {
     flexDirection: 'row',
@@ -180,83 +209,107 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   summaryTitle: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginLeft: 10,
-    color: '#444',
-  },
-  divider: {
-    marginVertical: 10,
+    marginLeft: 12,
+    color: '#2d3748',
   },
   lastUpdate: {
-    color: '#666',
+    color: '#718096',
     fontSize: 14,
   },
   section: {
-    padding: 15,
+    padding: 20,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 15,
-    color: '#444',
+    marginBottom: 20,
+    color: '#2d3748',
+  },
+  quickActionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
   },
   actionCard: {
-    borderRadius: 10,
-    marginBottom: 10,
-    padding: 15,
+    width: '48%',
+    marginBottom: 15,
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  actionContent: {
-    flexDirection: 'row',
+  actionGradient: {
+    padding: 20,
+    height: 160,
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  actionText: {
-    flex: 1,
-    marginLeft: 15,
-  },
   actionTitle: {
+    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#444',
+    marginTop: 12,
+    textAlign: 'center',
   },
   actionDescription: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 2,
-  },
-  actionButton: {
-    borderRadius: 25,
-    backgroundColor: '#0077B6',
-    paddingHorizontal: 15,
+    color: '#fff',
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 6,
+    opacity: 0.9,
   },
   sectionCard: {
-    borderRadius: 10,
-    marginBottom: 10,
-    padding: 0,
+    borderRadius: 16,
+    marginBottom: 12,
+    padding: 16,
+    borderLeftWidth: 4,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   sectionContent: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 15,
   },
   sectionLeft: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
+  },
+  iconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  sectionTextContainer: {
+    flex: 1,
   },
   sectionText: {
     fontSize: 16,
-    marginLeft: 10,
-    color: '#444',
-  },
-  sectionRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    fontWeight: '600',
+    color: '#2d3748',
+    marginBottom: 4,
   },
   sectionCount: {
-    fontSize: 16,
-    color: '#666',
-    marginRight: 10,
+    fontSize: 14,
+    color: '#718096',
   },
 });
 

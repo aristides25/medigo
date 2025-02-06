@@ -204,16 +204,26 @@ const BookAppointmentScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#E8F4F8',
   },
   section: {
     marginBottom: 20,
+    backgroundColor: '#ffffff',
+    padding: 15,
+    borderRadius: 16,
+    shadowColor: '#2d3748',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#444',
+    color: '#2d3748',
   },
   timeGrid: {
     flexDirection: 'row',
@@ -223,10 +233,12 @@ const styles = StyleSheet.create({
   timeButton: {
     width: '30%',
     marginBottom: 10,
+    borderRadius: 12,
+    borderColor: '#4facfe',
   },
   confirmButton: {
-    backgroundColor: '#0077B6',
-    borderRadius: 10,
+    backgroundColor: '#4facfe',
+    borderRadius: 12,
     paddingVertical: 12,
     marginTop: 10,
   },

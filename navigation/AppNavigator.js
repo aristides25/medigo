@@ -1,7 +1,12 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '@rneui/themed';
 import { TelemedicineProvider } from '../context/TelemedicineContext';
+
+// Auth Screens
+import LoginScreen from '../screens/auth/LoginScreen';
+import RegisterScreen from '../screens/auth/RegisterScreen';
+import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
 
 // Screens imports
 import HomeScreen from '../screens/HomeScreen';
@@ -45,13 +50,15 @@ import ConnectionTestScreen from '../screens/telemedicine/virtual-room/Connectio
 import WaitingRoomScreen from '../screens/telemedicine/virtual-room/WaitingRoomScreen';
 import ConsultationRoomScreen from '../screens/telemedicine/virtual-room/ConsultationRoomScreen';
 import PostConsultationScreen from '../screens/telemedicine/virtual-room/PostConsultationScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import SettingsScreen from '../screens/SettingsScreen';
 
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
   const { theme } = useTheme();
 
-  const screenOptions = {
+  const screenOptions = useMemo(() => ({
     headerStyle: {
       backgroundColor: theme.colors.primary,
     },
@@ -64,17 +71,37 @@ const AppNavigator = () => {
       fontFamily: 'System',
       fontSize: 14,
     },
-  };
+  }), [theme.colors.primary, theme.colors.white]);
 
   return (
     <TelemedicineProvider>
-      <Stack.Navigator screenOptions={screenOptions}>
-        {/* Home */}
+      <Stack.Navigator 
+        initialRouteName="Login"
+        screenOptions={{
+          ...screenOptions,
+          animation: 'slide_from_right',
+        }}
+      >
+        {/* Auth Screens */}
+        <Stack.Group 
+          screenOptions={{ 
+            headerShown: false,
+            animation: 'fade',
+          }}
+        >
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Register" component={RegisterScreen} />
+          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+        </Stack.Group>
+
+        {/* App Screens */}
         <Stack.Screen 
           name="Home" 
           component={HomeScreen}
           options={{
             title: 'MediGo',
+            headerBackVisible: false,
+            gestureEnabled: false,
           }}
         />
 
@@ -332,6 +359,22 @@ const AppNavigator = () => {
           options={{
             title: 'Finalizar Consulta',
             headerBackVisible: false,
+          }}
+        />
+
+        {/* Profile and Settings */}
+        <Stack.Screen 
+          name="Profile" 
+          component={ProfileScreen}
+          options={{
+            title: 'Mi Perfil',
+          }}
+        />
+        <Stack.Screen 
+          name="Settings" 
+          component={SettingsScreen}
+          options={{
+            title: 'Configuración',
           }}
         />
       </Stack.Navigator>
