@@ -18,7 +18,13 @@ const ActiveConsultationsScreen = ({ navigation }) => {
   };
 
   const ConsultationCard = ({ consultation }) => {
-    const isUpcoming = new Date(consultation.scheduledDate) > new Date();
+    const now = new Date();
+    const consultationDateTime = new Date(`${consultation.scheduledDate} ${consultation.scheduledTime}`);
+    const thirtyMinutesBefore = new Date(consultationDateTime.getTime() - 30 * 60000);
+    const thirtyMinutesAfter = new Date(consultationDateTime.getTime() + 30 * 60000);
+    
+    const isUpcoming = consultationDateTime > now;
+    const canJoin = now >= thirtyMinutesBefore && now <= thirtyMinutesAfter;
 
     return (
       <View style={styles.card}>
@@ -52,7 +58,7 @@ const ActiveConsultationsScreen = ({ navigation }) => {
           </View>
         </View>
 
-        {isUpcoming && (
+        {canJoin && (
           <TouchableOpacity
             style={styles.joinButton}
             onPress={() => handleJoinConsultation(consultation)}

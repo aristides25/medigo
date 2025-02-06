@@ -26,6 +26,8 @@ import ProductDetailScreen from '../screens/pharmacy/ProductDetailScreen';
 import CartScreen from '../screens/pharmacy/CartScreen';
 import MyPrescriptionsScreen from '../screens/pharmacy/MyPrescriptionsScreen';
 import UploadPrescriptionScreen from '../screens/pharmacy/UploadPrescriptionScreen';
+import CartDetailsScreen from '../screens/pharmacy/CartDetailsScreen';
+import DeliveryTrackingScreen from '../screens/pharmacy/DeliveryTrackingScreen';
 // Medical Records
 import MedicalRecordsScreen from '../screens/medical-records/MedicalRecordsScreen';
 import MedicalDocumentsScreen from '../screens/medical-records/MedicalDocumentsScreen';
@@ -206,6 +208,20 @@ const AppNavigator = () => {
           component={UploadPrescriptionScreen}
           options={{
             title: 'Subir Receta',
+          }}
+        />
+        <Stack.Screen 
+          name="CartDetails" 
+          component={CartDetailsScreen}
+          options={{
+            title: 'Detalles del Carrito',
+          }}
+        />
+        <Stack.Screen 
+          name="DeliveryTracking" 
+          component={DeliveryTrackingScreen}
+          options={{
+            title: 'Seguimiento del Pedido',
           }}
         />
 

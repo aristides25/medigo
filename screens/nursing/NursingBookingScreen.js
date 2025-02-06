@@ -64,7 +64,7 @@ const NursingBookingScreen = ({ route, navigation }) => {
           icon={{
             name: 'calendar',
             type: 'material-community',
-            color: '#0077CC',
+            color: '#4facfe',
           }}
           iconPosition="left"
           titleStyle={styles.dateButtonText}
@@ -79,7 +79,7 @@ const NursingBookingScreen = ({ route, navigation }) => {
           icon={{
             name: 'clock-outline',
             type: 'material-community',
-            color: '#0077CC',
+            color: '#4facfe',
           }}
           iconPosition="left"
           titleStyle={styles.dateButtonText}
@@ -93,7 +93,7 @@ const NursingBookingScreen = ({ route, navigation }) => {
           keyboardType="numeric"
           placeholder="Mínimo 2 horas"
           leftIcon={
-            <Icon name="timer-outline" type="material-community" color="#0077CC" />
+            <Icon name="timer-outline" type="material-community" color="#4facfe" />
           }
         />
 
@@ -104,7 +104,7 @@ const NursingBookingScreen = ({ route, navigation }) => {
           placeholder="Ingresa la dirección completa"
           multiline
           leftIcon={
-            <Icon name="map-marker" type="material-community" color="#0077CC" />
+            <Icon name="map-marker" type="material-community" color="#4facfe" />
           }
         />
 
@@ -116,7 +116,7 @@ const NursingBookingScreen = ({ route, navigation }) => {
           multiline
           numberOfLines={3}
           leftIcon={
-            <Icon name="note-text" type="material-community" color="#0077CC" />
+            <Icon name="note-text" type="material-community" color="#4facfe" />
           }
         />
       </View>
@@ -159,66 +159,87 @@ const NursingBookingScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#E8F4F8',
   },
   header: {
     padding: 20,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#ffffff',
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    shadowColor: '#4facfe',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
   },
   headerText: {
-    color: '#0077CC',
-    marginBottom: 5,
+    color: '#2d3748',
+    marginBottom: 8,
+    fontSize: 24,
+    fontWeight: '800',
   },
   price: {
     fontSize: 18,
-    color: '#2ecc71',
-    fontWeight: 'bold',
+    color: '#4facfe',
+    fontWeight: '600',
   },
   form: {
     padding: 20,
   },
   label: {
     fontSize: 16,
-    color: '#0077CC',
-    marginBottom: 5,
-    marginTop: 10,
+    color: '#2d3748',
+    marginBottom: 8,
+    marginTop: 12,
+    fontWeight: '600',
   },
   dateButton: {
-    borderColor: '#0077CC',
+    borderColor: '#4facfe',
     borderWidth: 1,
     marginBottom: 15,
+    borderRadius: 12,
+    backgroundColor: '#ffffff',
   },
   dateButtonText: {
-    color: '#0077CC',
+    color: '#4facfe',
     marginLeft: 10,
   },
   summary: {
     padding: 20,
-    backgroundColor: '#f8f9fa',
-    marginTop: 10,
+    backgroundColor: '#ffffff',
+    marginTop: 12,
+    borderRadius: 16,
+    shadowColor: '#2d3748',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   summaryTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#0077CC',
-    marginBottom: 10,
+    fontWeight: '600',
+    color: '#2d3748',
+    marginBottom: 12,
   },
   summaryText: {
     fontSize: 16,
-    color: '#2ecc71',
-    fontWeight: 'bold',
+    color: '#4facfe',
+    fontWeight: '600',
   },
   buttonContainer: {
     padding: 20,
     paddingBottom: 30,
   },
   button: {
-    backgroundColor: '#0077CC',
-    borderRadius: 25,
+    backgroundColor: '#4facfe',
+    borderRadius: 12,
     paddingVertical: 15,
   },
   buttonTitle: {
     fontSize: 18,
+    fontWeight: '600',
   },
 });
 

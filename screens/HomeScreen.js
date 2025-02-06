@@ -207,19 +207,19 @@ const HomeScreen = ({ navigation }) => {
     },
     {
       id: 4,
+      title: 'Servicios de Enfermería',
+      description: 'Cuidados a domicilio',
+      icon: 'nurse',
+      route: 'NursingHome',
+      gradient: ['#4776E6', '#8E54E9'],
+    },
+    {
+      id: 5,
       title: 'Emergencias',
       description: 'Servicio de ambulancia',
       icon: 'ambulance',
       route: 'EmergencyType',
       gradient: ['#eb3349', '#f45c43'],
-    },
-    {
-      id: 5,
-      title: 'Enfermería',
-      description: 'Cuidados a domicilio',
-      icon: 'doctor',
-      route: 'NursingHome',
-      gradient: ['#4776E6', '#8E54E9'],
     },
     {
       id: 6,
@@ -339,15 +339,15 @@ const HomeScreen = ({ navigation }) => {
               <Text style={styles.serviceText}>Telemedicina</Text>
             </TouchableOpacity>
 
-            {/* Servicios de Fertilidad */}
+            {/* Servicios de Enfermería */}
             <TouchableOpacity 
               style={styles.serviceCard} 
               onPress={() => navigation.navigate('NursingHome')}
             >
               <View style={styles.iconContainer}>
-                <Icon name="baby-face-outline" type="material-community" size={24} color={THEME_COLORS.primary} />
+                <Icon name="nurse" type="material-community" size={24} color={THEME_COLORS.primary} />
               </View>
-              <Text style={styles.serviceText}>Servicios de Fertilidad</Text>
+              <Text style={styles.serviceText}>Servicios de Enfermería</Text>
             </TouchableOpacity>
 
             {/* Ambulancia */}

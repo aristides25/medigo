@@ -201,8 +201,8 @@ const PharmacyScreen = ({ navigation }) => {
   const renderFilterItem = ({ item }) => (
     <TouchableOpacity
       style={[
-        styles.filterItem,
-        selectedFilter === item.id && styles.filterItemSelected
+        styles.filterButton,
+        selectedFilter === item.id && styles.filterButtonActive
       ]}
       onPress={() => handleFilterSelect(item.id)}
       activeOpacity={0.7}
@@ -214,8 +214,8 @@ const PharmacyScreen = ({ navigation }) => {
         color={selectedFilter === item.id ? '#fff' : '#666'}
       />
       <Text style={[
-        styles.filterText,
-        selectedFilter === item.id && styles.filterTextSelected
+        styles.filterButtonText,
+        selectedFilter === item.id && styles.filterButtonTextActive
       ]}>
         {item.name}
       </Text>
@@ -225,14 +225,17 @@ const PharmacyScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.fixedHeader}>
-        <View style={styles.headerContainer}>
-          <TouchableOpacity 
-            onPress={() => navigation.goBack()} 
-            style={styles.backButton}
-          >
-            <Icon name="arrow-left" type="material-community" size={24} color="#000" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Farmacias</Text>
+        <View style={styles.banner}>
+          <View style={styles.bannerContent}>
+            <Icon
+              name="pill"
+              type="material-community"
+              size={28}
+              color="#4facfe"
+            />
+            <Text style={styles.bannerTitle}>Farmacia</Text>
+          </View>
+          <Text style={styles.bannerSubtitle}>Escoge tus medicamentos</Text>
         </View>
 
         <View style={styles.searchSection}>
@@ -256,7 +259,9 @@ const PharmacyScreen = ({ navigation }) => {
               clearIcon={{ size: 20 }}
             />
           </View>
+        </View>
 
+        <View style={styles.filtersContainer}>
           <FlatList
             data={filters}
             renderItem={renderFilterItem}
@@ -272,9 +277,9 @@ const PharmacyScreen = ({ navigation }) => {
         data={filteredPharmacies}
         renderItem={renderPharmacyCard}
         keyExtractor={item => item.id}
-        contentContainerStyle={styles.pharmaciesList}
+        contentContainerStyle={styles.pharmacyList}
         showsVerticalScrollIndicator={false}
-        style={styles.pharmaciesListContainer}
+        style={styles.pharmacyListContainer}
       />
 
       {cartItems && cartItems.length > 0 && (
@@ -295,48 +300,61 @@ const PharmacyScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#E8F4F8',
   },
   fixedHeader: {
-    backgroundColor: '#fff',
-    zIndex: 1,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 2,
+    backgroundColor: 'transparent',
   },
-  headerContainer: {
+  banner: {
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 30,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    shadowColor: 'rgba(79, 172, 254, 0.25)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  bannerContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#fff',
+    marginBottom: 8,
   },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginLeft: 16,
+  bannerTitle: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#2d3748',
+    marginLeft: 12,
   },
-  backButton: {
-    padding: 8,
+  bannerSubtitle: {
+    fontSize: 16,
+    color: '#718096',
+    marginLeft: 40,
   },
   searchSection: {
-    backgroundColor: '#fff',
     paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 12,
+    marginTop: 16,
+    zIndex: 3,
   },
   searchBarContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    marginBottom: 12,
-    height: 48,
-    borderWidth: 1,
-    borderColor: '#eeeeee',
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 12,
+    shadowColor: 'rgba(79, 172, 254, 0.25)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 5,
   },
   searchIcon: {
     marginRight: 8,
@@ -359,50 +377,69 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
-  filtersList: {
-    paddingVertical: 4,
+  filtersContainer: {
+    marginTop: 12,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    zIndex: 2,
+    backgroundColor: '#E8F4F8',
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    shadowColor: 'rgba(79, 172, 254, 0.1)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 3,
   },
-  filterItem: {
+  filtersList: {
+    flexDirection: 'row',
+    paddingVertical: 8,
+  },
+  filterButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 12,
-    borderWidth: 1,
-    borderColor: '#eeeeee',
+    marginRight: 8,
+    shadowColor: 'rgba(79, 172, 254, 0.15)',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  filterItemSelected: {
-    backgroundColor: '#2196F3',
-    borderColor: '#1976D2',
+  filterButtonActive: {
+    backgroundColor: '#4facfe',
   },
-  filterText: {
-    marginLeft: 8,
+  filterButtonText: {
+    color: '#718096',
     fontSize: 14,
-    color: '#666',
     fontWeight: '500',
   },
-  filterTextSelected: {
-    color: '#fff',
+  filterButtonTextActive: {
+    color: '#ffffff',
   },
-  pharmaciesListContainer: {
+  pharmacyList: {
+    paddingTop: 240,
+    paddingHorizontal: 16,
+    paddingBottom: 80,
+  },
+  pharmacyListContainer: {
     flex: 1,
-    marginTop: 8,
-  },
-  pharmaciesList: {
-    padding: 16,
   },
   pharmacyCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
     padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    marginBottom: 16,
+    shadowColor: 'rgba(79, 172, 254, 0.15)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 3,
+    borderLeftWidth: 4,
+    borderLeftColor: '#4facfe',
   },
   pharmacyHeader: {
     flexDirection: 'row',
@@ -417,7 +454,8 @@ const styles = StyleSheet.create({
   },
   pharmacyName: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: '700',
+    color: '#2d3748',
     marginBottom: 4,
   },
   ratingContainer: {
@@ -430,26 +468,26 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   openBadge: {
-    backgroundColor: '#E8F5E9',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 12,
   },
   closedBadge: {
-    backgroundColor: '#FFEBEE',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    backgroundColor: 'rgba(244, 67, 54, 0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 12,
   },
   openText: {
-    color: '#2E7D32',
-    fontSize: 12,
-    fontWeight: '500',
+    color: '#4CAF50',
+    fontSize: 14,
+    fontWeight: '600',
   },
   closedText: {
-    color: '#C62828',
-    fontSize: 12,
-    fontWeight: '500',
+    color: '#F44336',
+    fontSize: 14,
+    fontWeight: '600',
   },
   deliveryInfo: {
     flexDirection: 'row',
@@ -470,11 +508,16 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#E91E63',
+    backgroundColor: '#4facfe',
     padding: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    shadowColor: 'rgba(79, 172, 254, 0.3)',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   cartItemCount: {
     color: '#fff',

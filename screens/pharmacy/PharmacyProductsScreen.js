@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, FlatList, TouchableOpacity, ScrollView } from 'react-native';
+import { View, StyleSheet, FlatList, TouchableOpacity, ScrollView, TextInput, Platform } from 'react-native';
 import { Text, SearchBar, Icon, Avatar, Button } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCart } from '../../context/CartContext';
@@ -126,7 +126,7 @@ const PharmacyProductsScreen = ({ route, navigation }) => {
   const { pharmacy } = route.params;
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const { cartItems = [], addToCart } = useCart();
+  const { cart = [], addToCart } = useCart();
 
   const filteredProducts = PRODUCTS.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(search.toLowerCase());
@@ -150,8 +150,8 @@ const PharmacyProductsScreen = ({ route, navigation }) => {
         size={100}
         title={item.initial}
         containerStyle={styles.productImage}
-        backgroundColor="#E8EAF6"
-        titleStyle={{ color: '#3F51B5' }}
+        backgroundColor="rgba(79, 172, 254, 0.05)"
+        titleStyle={{ color: '#4facfe' }}
       />
       <View style={styles.productInfo}>
         <Text style={styles.productName}>{item.name}</Text>
@@ -172,231 +172,283 @@ const PharmacyProductsScreen = ({ route, navigation }) => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Icon name="arrow-left" type="material-community" size={24} color="#000" />
-        </TouchableOpacity>
-        <View style={styles.pharmacyInfo}>
-          <Text style={styles.pharmacyName}>{pharmacy.name}</Text>
-          <View style={styles.pharmacyDetails}>
-            <Icon name="clock-outline" type="material-community" size={16} color="#666" />
-            <Text style={styles.pharmacyText}>{pharmacy.deliveryTime}</Text>
-            <Icon name="bike" type="material-community" size={16} color="#666" style={styles.detailIcon} />
-            <Text style={styles.pharmacyText}>Envío ${pharmacy.deliveryFee}</Text>
+    <View style={styles.container}>
+      <View style={styles.banner}>
+        <View style={styles.bannerContent}>
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Icon name="arrow-left" type="material-community" size={24} color="#fff" />
+          </TouchableOpacity>
+          
+          <View style={styles.pharmacyInfo}>
+            <Text style={styles.pharmacyName}>{pharmacy.name}</Text>
+            <View style={styles.deliveryInfo}>
+              <Icon name="truck-delivery" type="material-community" size={16} color="#fff" style={styles.deliveryIcon} />
+              <Text style={styles.deliveryText}>Entrega a domicilio</Text>
+              <Text style={styles.deliveryPrice}>$ {pharmacy.deliveryFee.toFixed(2)}</Text>
+            </View>
           </View>
+
+          <TouchableOpacity 
+            style={styles.cartButton}
+            onPress={() => navigation.navigate('CartDetails')}
+          >
+            <Icon name="cart" type="material-community" size={24} color="#fff" />
+            {cart.length > 0 && (
+              <View style={styles.cartBadge}>
+                <Text style={styles.cartBadgeText}>{cart.length}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
         </View>
       </View>
 
-      <SearchBar
-        placeholder="Buscar productos..."
-        onChangeText={setSearch}
-        value={search}
-        containerStyle={styles.searchContainer}
-        inputContainerStyle={styles.searchInputContainer}
-        inputStyle={styles.searchInput}
-        searchIcon={{ size: 24, color: '#666' }}
-        platform="default"
-        round
-        lightTheme
-      />
-
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false}
-        style={styles.categoriesContainer}
-      >
-        {CATEGORIES.map(category => (
-          <TouchableOpacity
-            key={category.id}
-            style={[
-              styles.categoryItem,
-              selectedCategory?.id === category.id && styles.selectedCategory
-            ]}
-            onPress={() => setSelectedCategory(selectedCategory?.id === category.id ? null : category)}
-          >
-            <Icon
-              name={category.icon}
-              type="material-community"
-              size={24}
-              color={selectedCategory?.id === category.id ? '#fff' : '#666'}
-            />
-            <Text style={[
-              styles.categoryName,
-              selectedCategory?.id === category.id && styles.selectedCategoryText
-            ]}>
-              {category.name}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      <View style={styles.filtersContainer}>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.filtersList}
+        >
+          {CATEGORIES.map(category => (
+            <TouchableOpacity
+              key={category.id}
+              style={[
+                styles.filterItem,
+                selectedCategory?.id === category.id && styles.filterItemSelected
+              ]}
+              onPress={() => setSelectedCategory(selectedCategory?.id === category.id ? null : category)}
+            >
+              <Icon
+                name={category.icon}
+                type="material-community"
+                size={20}
+                color={selectedCategory?.id === category.id ? '#fff' : '#666'}
+              />
+              <Text style={[
+                styles.filterText,
+                selectedCategory?.id === category.id && styles.filterTextSelected
+              ]}>
+                {category.name}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
 
       <FlatList
         data={filteredProducts}
         renderItem={renderProductCard}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.productsList}
-        showsVerticalScrollIndicator={false}
       />
 
-      {cartItems && cartItems.length > 0 && (
+      {cart && cart.length > 0 && (
         <TouchableOpacity 
-          style={styles.cartButton}
-          onPress={() => navigation.navigate('Cart')}
+          style={[styles.cartButton, styles.floatingCartButton]}
+          onPress={() => navigation.navigate('CartDetails')}
         >
-          <Text style={styles.cartItemCount}>{cartItems.length} producto{cartItems.length > 1 ? 's' : ''}</Text>
-          <Text style={styles.cartTotal}>$ {calculateTotal(cartItems)}</Text>
+          <Text style={styles.cartItemCount}>{cart.length} producto{cart.length > 1 ? 's' : ''}</Text>
+          <Text style={styles.cartTotal}>$ {calculateTotal(cart)}</Text>
           <Text style={styles.viewCartText}>Ver mi carrito</Text>
         </TouchableOpacity>
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f5f5f5',
   },
-  header: {
+  banner: {
+    backgroundColor: '#4facfe',
+    paddingTop: Platform.OS === 'ios' ? 48 : 32,
+    paddingBottom: 16,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    shadowColor: 'rgba(79, 172, 254, 0.4)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  bannerContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    paddingHorizontal: 16,
   },
   backButton: {
-    marginRight: 12,
+    padding: 8,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
   },
   pharmacyInfo: {
     flex: 1,
-  },
-  pharmacyName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  pharmacyDetails: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  pharmacyText: {
-    fontSize: 14,
-    color: '#666',
-    marginLeft: 4,
-  },
-  detailIcon: {
     marginLeft: 12,
   },
-  searchContainer: {
-    backgroundColor: 'transparent',
-    borderTopWidth: 0,
-    borderBottomWidth: 0,
-    padding: 8,
-    marginBottom: 8,
+  pharmacyName: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 4,
   },
-  searchInputContainer: {
-    backgroundColor: '#f5f5f5',
-    borderRadius: 25,
-    height: 40,
-  },
-  searchInput: {
-    fontSize: 16,
-  },
-  categoriesContainer: {
-    paddingHorizontal: 8,
-    marginBottom: 8,
-  },
-  categoryItem: {
+  deliveryInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginHorizontal: 4,
   },
-  selectedCategory: {
-    backgroundColor: '#2196F3',
+  deliveryIcon: {
+    marginRight: 4,
   },
-  categoryName: {
-    marginLeft: 8,
+  deliveryText: {
     fontSize: 14,
-    color: '#666',
+    color: 'rgba(255, 255, 255, 0.9)',
+    marginRight: 8,
   },
-  selectedCategoryText: {
+  deliveryPrice: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  cartButton: {
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    position: 'relative',
+  },
+  cartBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: '#E91E63',
+    borderRadius: 12,
+    minWidth: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  cartBadgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '700',
+    paddingHorizontal: 6,
+  },
+  filtersContainer: {
+    marginTop: 8,
+    marginBottom: 8,
+    backgroundColor: '#E8F4F8',
+  },
+  filtersList: {
+    paddingHorizontal: 16,
+    paddingVertical: 4,
+  },
+  filterItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginRight: 8,
+  },
+  filterItemSelected: {
+    backgroundColor: '#4facfe',
+  },
+  filterText: {
+    color: '#666',
+    marginLeft: 6,
+    fontSize: 14,
+  },
+  filterTextSelected: {
     color: '#fff',
   },
   productsList: {
-    padding: 8,
+    paddingTop: 8,
+    paddingHorizontal: 12,
   },
   productCard: {
-    flexDirection: 'row',
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 12,
     marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   productImage: {
-    marginRight: 12,
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   productInfo: {
     flex: 1,
+    marginLeft: 12,
   },
   productName: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
+    color: '#2d3748',
     marginBottom: 4,
   },
   productDescription: {
     fontSize: 14,
-    color: '#666',
+    color: '#718096',
     marginBottom: 4,
   },
   productUnit: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 8,
+    fontSize: 14,
+    color: '#718096',
   },
   priceContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginTop: 4,
   },
   productPrice: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2196F3',
+    fontWeight: '700',
+    color: '#4facfe',
   },
   addButton: {
-    backgroundColor: '#2196F3',
-    borderRadius: 20,
+    backgroundColor: '#4facfe',
     paddingHorizontal: 16,
     paddingVertical: 6,
-    minWidth: 100,
+    borderRadius: 20,
   },
   addButtonText: {
+    color: '#fff',
     fontSize: 14,
+    fontWeight: '600',
   },
-  cartButton: {
+  floatingCartButton: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: '#E91E63',
-    padding: 16,
+    bottom: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: '#E31837',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   cartItemCount: {
     color: '#fff',
     fontSize: 16,
+    fontWeight: '600',
   },
   cartTotal: {
     color: '#fff',
