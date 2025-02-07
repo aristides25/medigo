@@ -18,13 +18,7 @@ const ActiveConsultationsScreen = ({ navigation }) => {
   };
 
   const ConsultationCard = ({ consultation }) => {
-    const now = new Date();
-    const consultationDateTime = new Date(`${consultation.scheduledDate} ${consultation.scheduledTime}`);
-    const thirtyMinutesBefore = new Date(consultationDateTime.getTime() - 30 * 60000);
-    const thirtyMinutesAfter = new Date(consultationDateTime.getTime() + 30 * 60000);
-    
-    const isUpcoming = consultationDateTime > now;
-    const canJoin = now >= thirtyMinutesBefore && now <= thirtyMinutesAfter;
+    const isUpcoming = consultation.status !== 'completed';
 
     return (
       <View style={styles.card}>
@@ -58,9 +52,32 @@ const ActiveConsultationsScreen = ({ navigation }) => {
           </View>
         </View>
 
-        {canJoin && (
+        <TouchableOpacity
+          style={[
+            styles.joinButton, 
+            { 
+              backgroundColor: '#2196F3',
+              opacity: consultation.status === 'completed' ? 0.7 : 1
+            }
+          ]}
+          onPress={() => navigation.navigate('WaitingRoom', { consultationId: consultation.id })}
+          disabled={consultation.status === 'completed'}
+        >
+          <MaterialIcons 
+            name="meeting-room" 
+            size={24} 
+            color="white"
+          />
+          <Text style={styles.joinButtonText}>
+            {consultation.status === 'completed' 
+              ? 'Consulta finalizada'
+              : 'Ingresar a Sala de Espera'}
+          </Text>
+        </TouchableOpacity>
+
+        {isUpcoming && (
           <TouchableOpacity
-            style={styles.joinButton}
+            style={[styles.joinButton, { marginTop: 8 }]}
             onPress={() => handleJoinConsultation(consultation)}
           >
             <MaterialIcons name="video-call" size={24} color="white" />
@@ -195,12 +212,12 @@ const styles = StyleSheet.create({
   statusContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginBottom: 16,
+    marginTop: 8,
   },
   statusBadge: {
     paddingHorizontal: 12,
     paddingVertical: 4,
-    borderRadius: 16,
+    borderRadius: 20,
   },
   upcomingBadge: {
     backgroundColor: '#E3F2FD',
@@ -209,23 +226,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#E8F5E9',
   },
   statusText: {
-    fontSize: 12,
-    fontWeight: 'bold',
+    fontSize: 14,
+    fontWeight: '500',
   },
   joinButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#2196F3',
-    borderRadius: 8,
     padding: 12,
-    marginBottom: 16,
+    borderRadius: 10,
+    marginTop: 10,
   },
   joinButtonText: {
     color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
     marginLeft: 8,
+    fontSize: 16,
+    fontWeight: '600',
   },
   cardFooter: {
     flexDirection: 'row',

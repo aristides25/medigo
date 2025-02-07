@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, TouchableOpacity, TextInput, Image, ScrollView } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, TextInput, Image, ScrollView, Alert } from 'react-native';
 import { Text, Icon } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -27,15 +27,29 @@ const HomeScreen = ({ navigation }) => {
 
   // Definir los módulos disponibles para búsqueda
   const modules = [
-    { 
-      name: 'Farmacia', 
-      route: 'Pharmacy',
-      keywords: ['farmacia', 'medicamentos', 'medicina', 'drogueria']
-    },
-    { 
-      name: 'Citas Presenciales', 
+    {
+      id: 1,
+      title: 'Citas Médicas',
+      description: 'Agenda tus citas médicas',
+      icon: 'calendar-month',
       route: 'Appointments',
-      keywords: ['cita', 'presencial', 'doctor', 'medico', 'consulta']
+      color: '#4CAF50'
+    },
+    {
+      id: 2,
+      title: 'Farmacia',
+      description: 'Medicamentos y productos',
+      icon: 'medical-bag',
+      route: 'Pharmacy',
+      color: '#2196F3'
+    },
+    {
+      id: 3,
+      title: 'Enfermería',
+      description: 'Servicios de enfermería',
+      icon: 'hospital-box',
+      route: 'Nursing',
+      color: '#9C27B0'
     },
     { 
       name: 'Telemedicina', 
@@ -59,14 +73,18 @@ const HomeScreen = ({ navigation }) => {
     }
   ];
 
-  // Función para filtrar módulos basado en el texto de búsqueda
   const getFilteredModules = () => {
     if (!searchText) return [];
-    const searchLower = searchText.toLowerCase();
+    
     return modules.filter(module => 
-      module.name.toLowerCase().includes(searchLower) ||
-      module.keywords.some(keyword => keyword.includes(searchLower))
+      module.title.toLowerCase().includes(searchText.toLowerCase()) ||
+      (module.description && module.description.toLowerCase().includes(searchText.toLowerCase()))
     );
+  };
+
+  const handleSearch = (text) => {
+    setSearchText(text || '');
+    setShowResults(!!text);
   };
 
   // Función para manejar la selección de un módulo
@@ -201,7 +219,7 @@ const HomeScreen = ({ navigation }) => {
       id: 3,
       title: 'Farmacia',
       description: 'Medicamentos y productos',
-      icon: 'pharmacy',
+      icon: 'medical-bag',
       route: 'Pharmacy',
       gradient: ['#1d976c', '#93f9b9'],
     },
@@ -209,7 +227,7 @@ const HomeScreen = ({ navigation }) => {
       id: 4,
       title: 'Servicios de Enfermería',
       description: 'Cuidados a domicilio',
-      icon: 'nurse',
+      icon: 'hospital-box',
       route: 'NursingHome',
       gradient: ['#4776E6', '#8E54E9'],
     },
@@ -231,13 +249,43 @@ const HomeScreen = ({ navigation }) => {
     },
   ];
 
+  const handleLogout = () => {
+    Alert.alert(
+      "Cerrar Sesión",
+      "¿Estás seguro de que deseas salir de la aplicación?",
+      [
+        {
+          text: "No",
+          style: "cancel"
+        },
+        {
+          text: "Sí",
+          onPress: () => navigation.replace('Login')
+        }
+      ]
+    );
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <View style={styles.content}>
-          {/* Header con saludo */}
+          {/* Header con saludo y botón de logout */}
           <View style={styles.header}>
-            <Text style={styles.greeting}>Hola, José Daniel</Text>
+            <View style={styles.headerContent}>
+              <Text style={styles.greeting}>Hola, José Daniel</Text>
+              <TouchableOpacity 
+                style={styles.logoutButton}
+                onPress={handleLogout}
+              >
+                <Icon 
+                  name="logout" 
+                  type="material-community" 
+                  size={24} 
+                  color="#fff" 
+                />
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Tarjeta de próxima cita */}
@@ -258,120 +306,107 @@ const HomeScreen = ({ navigation }) => {
 
           {/* Barra de búsqueda mejorada */}
           <View style={styles.searchContainer}>
-            <View style={styles.searchBar}>
-              <Icon name="magnify" type="material-community" size={24} color={THEME_COLORS.primary} />
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Buscar por especialidad o servicio"
-                placeholderTextColor="#666"
-                value={searchText}
-                onChangeText={(text) => {
-                  setSearchText(text);
-                  setShowResults(!!text);
-                }}
-              />
-              {searchText ? (
-                <TouchableOpacity 
-                  onPress={() => {
-                    setSearchText('');
-                    setShowResults(false);
-                  }}
-                >
-                  <Icon name="close" type="material-community" size={20} color="#666" />
-                </TouchableOpacity>
-              ) : null}
-            </View>
-            
-            {/* Resultados de búsqueda */}
-            {showResults && (
-              <View style={styles.searchResults}>
-                {getFilteredModules().map((module, index) => (
+            <Icon name="magnify" type="material-community" size={24} color={THEME_COLORS.gray} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Buscar servicios..."
+              value={searchText}
+              onChangeText={handleSearch}
+              placeholderTextColor={THEME_COLORS.gray}
+            />
+            {searchText ? (
+              <TouchableOpacity onPress={() => handleSearch('')}>
+                <Icon name="close" type="material-community" size={24} color={THEME_COLORS.gray} />
+              </TouchableOpacity>
+            ) : null}
+          </View>
+          
+          {showResults && searchText ? (
+            <View style={styles.searchResults}>
+              {getFilteredModules().length > 0 ? (
+                getFilteredModules().map((module) => (
                   <TouchableOpacity
-                    key={index}
+                    key={module.id}
                     style={styles.searchResultItem}
-                    onPress={() => handleModuleSelect(module.route)}
+                    onPress={() => navigation.navigate(module.route)}
                   >
-                    <Text style={styles.searchResultText}>{module.name}</Text>
-                    <Icon name="chevron-right" type="material-community" size={20} color="#666" />
+                    <Text style={styles.searchResultText}>{module.title}</Text>
+                    <Icon name="chevron-right" type="material-community" size={24} color={THEME_COLORS.gray} />
                   </TouchableOpacity>
-                ))}
-                {getFilteredModules().length === 0 && searchText && (
-                  <View style={styles.searchResultItem}>
-                    <Text style={styles.noResultsText}>No se encontraron resultados</Text>
-                  </View>
-                )}
-              </View>
-            )}
-          </View>
+                ))
+              ) : (
+                <Text style={styles.noResultsText}>No se encontraron resultados</Text>
+              )}
+            </View>
+          ) : (
+            <View style={styles.servicesGrid}>
+              {/* Farmacia */}
+              <TouchableOpacity 
+                style={styles.serviceCard} 
+                onPress={() => navigation.navigate('Pharmacy')}
+              >
+                <View style={styles.iconContainer}>
+                  <Icon name="medical-bag" type="material-community" size={24} color={THEME_COLORS.primary} />
+                </View>
+                <Text style={styles.serviceText}>Farmacia</Text>
+              </TouchableOpacity>
 
-          {/* Grid de servicios */}
-          <View style={styles.servicesGrid}>
-            {/* Farmacia */}
-            <TouchableOpacity 
-              style={styles.serviceCard} 
-              onPress={() => navigation.navigate('Pharmacy')}
-            >
-              <View style={styles.iconContainer}>
-                <Icon name="pharmacy" type="material-community" size={24} color={THEME_COLORS.primary} />
-              </View>
-              <Text style={styles.serviceText}>Farmacia</Text>
-            </TouchableOpacity>
+              {/* Citas Médicas */}
+              <TouchableOpacity 
+                style={styles.serviceCard} 
+                onPress={() => navigation.navigate('Appointments')}
+              >
+                <View style={styles.iconContainer}>
+                  <Icon name="calendar-month" type="material-community" size={24} color={THEME_COLORS.primary} />
+                </View>
+                <Text style={styles.serviceText}>Citas Presenciales</Text>
+              </TouchableOpacity>
 
-            {/* Citas Médicas */}
-            <TouchableOpacity 
-              style={styles.serviceCard} 
-              onPress={() => navigation.navigate('Appointments')}
-            >
-              <View style={styles.iconContainer}>
-                <Icon name="hospital-building" type="material-community" size={24} color={THEME_COLORS.primary} />
-              </View>
-              <Text style={styles.serviceText}>Citas Presenciales</Text>
-            </TouchableOpacity>
+              {/* Telemedicina */}
+              <TouchableOpacity 
+                style={styles.serviceCard} 
+                onPress={() => navigation.navigate('TelemedicineHome')}
+              >
+                <View style={styles.iconContainer}>
+                  <Icon name="phone-plus" type="material-community" size={24} color={THEME_COLORS.primary} />
+                </View>
+                <Text style={styles.serviceText}>Telemedicina</Text>
+              </TouchableOpacity>
 
-            {/* Telemedicina */}
-            <TouchableOpacity 
-              style={styles.serviceCard} 
-              onPress={() => navigation.navigate('TelemedicineHome')}
-            >
-              <View style={styles.iconContainer}>
-                <Icon name="phone-plus" type="material-community" size={24} color={THEME_COLORS.primary} />
-              </View>
-              <Text style={styles.serviceText}>Telemedicina</Text>
-            </TouchableOpacity>
+              {/* Servicios de Enfermería */}
+              <TouchableOpacity 
+                style={styles.serviceCard} 
+                onPress={() => navigation.navigate('NursingHome')}
+              >
+                <View style={styles.iconContainer}>
+                  <Icon name="hospital-box" type="material-community" size={24} color={THEME_COLORS.primary} />
+                </View>
+                <Text style={styles.serviceText}>Servicios de Enfermería</Text>
+              </TouchableOpacity>
 
-            {/* Servicios de Enfermería */}
-            <TouchableOpacity 
-              style={styles.serviceCard} 
-              onPress={() => navigation.navigate('NursingHome')}
-            >
-              <View style={styles.iconContainer}>
-                <Icon name="nurse" type="material-community" size={24} color={THEME_COLORS.primary} />
-              </View>
-              <Text style={styles.serviceText}>Servicios de Enfermería</Text>
-            </TouchableOpacity>
+              {/* Ambulancia */}
+              <TouchableOpacity 
+                style={styles.serviceCard} 
+                onPress={() => navigation.navigate('EmergencyMap')}
+              >
+                <View style={styles.iconContainer}>
+                  <Icon name="ambulance" type="material-community" size={24} color={THEME_COLORS.primary} />
+                </View>
+                <Text style={styles.serviceText}>Ambulancia</Text>
+              </TouchableOpacity>
 
-            {/* Ambulancia */}
-            <TouchableOpacity 
-              style={styles.serviceCard} 
-              onPress={() => navigation.navigate('EmergencyMap')}
-            >
-              <View style={styles.iconContainer}>
-                <Icon name="ambulance" type="material-community" size={24} color={THEME_COLORS.primary} />
-              </View>
-              <Text style={styles.serviceText}>Ambulancia</Text>
-            </TouchableOpacity>
-
-            {/* Portal del Paciente */}
-            <TouchableOpacity 
-              style={styles.serviceCard} 
-              onPress={() => navigation.navigate('MedicalRecords')}
-            >
-              <View style={styles.iconContainer}>
-                <Icon name="account" type="material-community" size={24} color={THEME_COLORS.primary} />
-              </View>
-              <Text style={styles.serviceText}>Portal del Paciente</Text>
-            </TouchableOpacity>
-          </View>
+              {/* Portal del Paciente */}
+              <TouchableOpacity 
+                style={styles.serviceCard} 
+                onPress={() => navigation.navigate('MedicalRecords')}
+              >
+                <View style={styles.iconContainer}>
+                  <Icon name="account" type="material-community" size={24} color={THEME_COLORS.primary} />
+                </View>
+                <Text style={styles.serviceText}>Portal del Paciente</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
 
         {/* Barra de navegación inferior */}
@@ -438,6 +473,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.3)',
   },
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   greeting: {
     fontSize: 26,
     fontWeight: '800',
@@ -446,6 +486,11 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
     letterSpacing: 0.5,
+  },
+  logoutButton: {
+    padding: 8,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
   },
   appointmentCard: {
     flexDirection: 'row',
@@ -522,20 +567,6 @@ const styles = StyleSheet.create({
   searchContainer: {
     marginBottom: 20,
     zIndex: 1000,
-  },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    padding: 12,
-    borderRadius: 20,
-    shadowColor: THEME_COLORS.darkBlue,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 6,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.25)',
   },
   searchInput: {
     flex: 1,

@@ -37,6 +37,7 @@ import UploadDocumentScreen from '../screens/medical-records/UploadDocumentScree
 import EmergencyTypeScreen from '../screens/emergency/EmergencyTypeScreen';
 import EmergencyMapScreen from '../screens/emergency/EmergencyMapScreen';
 import EmergencyTrackingScreen from '../screens/emergency/EmergencyTrackingScreen';
+import EmergencyForm from '../screens/emergency/EmergencyForm';
 // Nursing
 import NursingHomeScreen from '../screens/nursing/NursingHomeScreen';
 import NursingServiceDetailScreen from '../screens/nursing/NursingServiceDetailScreen';
@@ -275,6 +276,13 @@ const AppNavigator = () => {
           component={EmergencyTrackingScreen}
           options={{
             title: 'Seguimiento',
+          }}
+        />
+        <Stack.Screen 
+          name="EmergencyForm" 
+          component={EmergencyForm}
+          options={{
+            title: 'Formulario de Emergencia',
           }}
         />
 

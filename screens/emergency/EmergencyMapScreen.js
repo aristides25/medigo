@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Dimensions, TouchableOpacity, FlatList, ActivityIndicator, ScrollView } from 'react-native';
 import { Text, Button, Icon, SearchBar } from '@rneui/themed';
 import * as Location from 'expo-location';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Polyline } from 'react-native-maps';
 
 const services = [
   {
@@ -37,6 +37,7 @@ const EmergencyMapScreen = ({ navigation, route }) => {
   const [followsUserLocation, setFollowsUserLocation] = useState(true);
   const [selectedService, setSelectedService] = useState(null);
   const [formDataReceived, setFormDataReceived] = useState(false);
+  const [routeCoordinates, setRouteCoordinates] = useState([]);
 
   // Función para obtener la dirección de una ubicación
   const getAddressFromCoords = async (coords) => {
@@ -416,11 +417,10 @@ const EmergencyMapScreen = ({ navigation, route }) => {
       </TouchableOpacity>
 
       <TouchableOpacity 
-        style={[
-          styles.formButton,
-          formDataReceived && styles.formButtonSaved
-        ]}
-        onPress={() => navigation.navigate('EmergencyForm')}
+        style={[styles.formButton, formDataReceived && styles.formButtonSaved]}
+        onPress={() => {
+          navigation.navigate('EmergencyForm');
+        }}
       >
         <Icon 
           name="description" 
@@ -429,6 +429,15 @@ const EmergencyMapScreen = ({ navigation, route }) => {
           size={24} 
         />
       </TouchableOpacity>
+
+      {/* Ruta de la ambulancia */}
+      {routeCoordinates.length > 0 && (
+        <Polyline
+          coordinates={routeCoordinates}
+          strokeColor="#e74c3c"
+          strokeWidth={3}
+        />
+      )}
     </View>
   );
 };
