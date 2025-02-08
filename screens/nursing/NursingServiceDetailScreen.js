@@ -6,7 +6,7 @@ const NursingServiceDetailScreen = ({ route, navigation }) => {
   const { service } = route.params;
 
   const handleBooking = () => {
-    navigation.navigate('NursingBooking', { service });
+    navigation.navigate('NurseSelection', { service });
   };
 
   return (

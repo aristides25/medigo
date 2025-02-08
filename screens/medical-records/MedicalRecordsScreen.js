@@ -10,28 +10,40 @@ const MedicalRecordsScreen = ({ navigation }) => {
 
   const quickActions = [
     {
-      id: 1,
+      id: '1',
+      title: 'Datos Personales',
+      subtitle: 'Información médica personal',
+      icon: 'account-details',
+      iconType: 'material-community',
+      route: 'PersonalMedicalData',
+      backgroundColor: '#4facfe',
+    },
+    {
+      id: '2',
       title: 'Subir Documento',
-      icon: 'file-upload',
+      subtitle: 'Agregar documentos médicos',
+      icon: 'file-upload-outline',
+      iconType: 'material-community',
       route: 'UploadDocument',
-      description: 'Añade documentos médicos a tu expediente',
-      gradient: ['#4facfe', '#00f2fe']
+      backgroundColor: '#4facfe',
     },
     {
-      id: 2,
+      id: '3',
       title: 'Compartir Expediente',
+      subtitle: 'Enviar documentos médicos',
       icon: 'share-variant',
-      route: 'ShareRecords',
-      description: 'Comparte tu expediente con proveedores médicos',
-      gradient: ['#6a11cb', '#2575fc']
+      iconType: 'material-community',
+      route: 'ShareMedicalRecord',
+      backgroundColor: '#6a11cb',
     },
     {
-      id: 3,
+      id: '4',
       title: 'Recetas Digitales',
-      icon: 'file-document-edit',
+      subtitle: 'Gestionar recetas médicas',
+      icon: 'file-document-edit-outline',
+      iconType: 'material-community',
       route: 'DigitalPrescriptions',
-      description: 'Gestiona tus recetas médicas',
-      gradient: ['#1d976c', '#93f9b9']
+      backgroundColor: '#4ade80',
     },
   ];
 
@@ -40,6 +52,7 @@ const MedicalRecordsScreen = ({ navigation }) => {
       id: 1,
       title: 'Historial de Citas',
       icon: 'calendar-clock',
+      iconType: 'material-community',
       route: 'AppointmentHistory',
       count: appointments.length,
       color: '#4facfe'
@@ -47,7 +60,8 @@ const MedicalRecordsScreen = ({ navigation }) => {
     {
       id: 2,
       title: 'Documentos Médicos',
-      icon: 'file-document-multiple',
+      icon: 'file-document-multiple-outline',
+      iconType: 'material-community',
       route: 'MedicalDocuments',
       count: documents.length,
       color: '#6a11cb'
@@ -56,19 +70,16 @@ const MedicalRecordsScreen = ({ navigation }) => {
       id: 3,
       title: 'Resultados de Laboratorio',
       icon: 'test-tube',
+      iconType: 'material-community',
       route: 'LabResults',
       count: documents.filter(doc => doc.type === 'LAB_RESULT').length,
       color: '#1d976c'
-    },
-    {
-      id: 4,
-      title: 'Historial de Prescripciones',
-      icon: 'prescription',
-      route: 'PrescriptionHistory',
-      count: prescriptions.length,
-      color: '#f77062'
-    },
+    }
   ];
+
+  const handleShareRecord = () => {
+    navigation.navigate('ShareMedicalRecord');
+  };
 
   if (loading) {
     return (
@@ -107,27 +118,22 @@ const MedicalRecordsScreen = ({ navigation }) => {
           <View style={styles.quickActionsGrid}>
             {quickActions.map((action) => (
               <TouchableOpacity 
-                key={action.id}
-                style={styles.actionCard}
+                key={action.title}
+                style={[styles.actionCard, { backgroundColor: action.backgroundColor }]}
                 onPress={() => navigation.navigate(action.route)}
               >
-                <LinearGradient
-                  colors={action.gradient}
-                  style={styles.actionGradient}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                >
+                <View style={styles.actionContent}>
                   <Icon
                     name={action.icon}
-                    type="material-community"
+                    type={action.iconType}
                     size={32}
-                    color="#fff"
+                    color="#ffffff"
                   />
                   <Text style={styles.actionTitle}>{action.title}</Text>
                   <Text style={styles.actionDescription}>
-                    {action.description}
+                    {action.subtitle}
                   </Text>
-                </LinearGradient>
+                </View>
               </TouchableOpacity>
             ))}
           </View>
@@ -147,7 +153,7 @@ const MedicalRecordsScreen = ({ navigation }) => {
                     <View style={[styles.iconContainer, { backgroundColor: `${section.color}15` }]}>
                       <Icon
                         name={section.icon}
-                        type="material-community"
+                        type={section.iconType}
                         size={24}
                         color={section.color}
                       />
@@ -234,36 +240,38 @@ const styles = StyleSheet.create({
   },
   actionCard: {
     width: '48%',
+    aspectRatio: 1,
     marginBottom: 15,
-    borderRadius: 16,
+    borderRadius: 20,
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 4,
     },
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 5,
   },
-  actionGradient: {
+  actionContent: {
+    flex: 1,
     padding: 20,
-    height: 160,
     justifyContent: 'center',
     alignItems: 'center',
   },
   actionTitle: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#ffffff',
     marginTop: 12,
     textAlign: 'center',
+    lineHeight: 24,
   },
   actionDescription: {
-    color: '#fff',
-    fontSize: 12,
+    fontSize: 13,
+    color: '#ffffff',
+    marginTop: 8,
     textAlign: 'center',
-    marginTop: 6,
     opacity: 0.9,
   },
   sectionCard: {

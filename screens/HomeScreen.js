@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, TouchableOpacity, TextInput, Image, ScrollView, Alert } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
 import { Text, Icon } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -22,77 +22,6 @@ const THEME_COLORS = {
 const HomeScreen = ({ navigation }) => {
   const [location, setLocation] = useState(null);
   const [locationText, setLocationText] = useState('Obteniendo ubicación...');
-  const [searchText, setSearchText] = useState('');
-  const [showResults, setShowResults] = useState(false);
-
-  // Definir los módulos disponibles para búsqueda
-  const modules = [
-    {
-      id: 1,
-      title: 'Citas Médicas',
-      description: 'Agenda tus citas médicas',
-      icon: 'calendar-month',
-      route: 'Appointments',
-      color: '#4CAF50'
-    },
-    {
-      id: 2,
-      title: 'Farmacia',
-      description: 'Medicamentos y productos',
-      icon: 'medical-bag',
-      route: 'Pharmacy',
-      color: '#2196F3'
-    },
-    {
-      id: 3,
-      title: 'Enfermería',
-      description: 'Servicios de enfermería',
-      icon: 'hospital-box',
-      route: 'Nursing',
-      color: '#9C27B0'
-    },
-    { 
-      name: 'Telemedicina', 
-      route: 'TelemedicineHome',
-      keywords: ['tele', 'virtual', 'online', 'video consulta']
-    },
-    { 
-      name: 'Servicios de Fertilidad', 
-      route: 'NursingHome',
-      keywords: ['fertilidad', 'embarazo', 'reproduccion']
-    },
-    { 
-      name: 'Ambulancia', 
-      route: 'EmergencyMap',
-      keywords: ['emergencia', 'urgencia', 'ambulancia']
-    },
-    { 
-      name: 'Portal del Paciente', 
-      route: 'MedicalRecords',
-      keywords: ['portal', 'perfil', 'historial', 'expediente']
-    }
-  ];
-
-  const getFilteredModules = () => {
-    if (!searchText) return [];
-    
-    return modules.filter(module => 
-      module.title.toLowerCase().includes(searchText.toLowerCase()) ||
-      (module.description && module.description.toLowerCase().includes(searchText.toLowerCase()))
-    );
-  };
-
-  const handleSearch = (text) => {
-    setSearchText(text || '');
-    setShowResults(!!text);
-  };
-
-  // Función para manejar la selección de un módulo
-  const handleModuleSelect = (route) => {
-    setSearchText('');
-    setShowResults(false);
-    navigation.navigate(route);
-  };
 
   useEffect(() => {
     let locationSubscription;
@@ -304,109 +233,73 @@ const HomeScreen = ({ navigation }) => {
             )}
           </View>
 
-          {/* Barra de búsqueda mejorada */}
-          <View style={styles.searchContainer}>
-            <Icon name="magnify" type="material-community" size={24} color={THEME_COLORS.gray} />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Buscar servicios..."
-              value={searchText}
-              onChangeText={handleSearch}
-              placeholderTextColor={THEME_COLORS.gray}
-            />
-            {searchText ? (
-              <TouchableOpacity onPress={() => handleSearch('')}>
-                <Icon name="close" type="material-community" size={24} color={THEME_COLORS.gray} />
-              </TouchableOpacity>
-            ) : null}
+          <View style={styles.servicesGrid}>
+            {/* Farmacia */}
+            <TouchableOpacity 
+              style={styles.serviceCard} 
+              onPress={() => navigation.navigate('Pharmacy')}
+            >
+              <View style={styles.iconContainer}>
+                <Icon name="medical-bag" type="material-community" size={24} color={THEME_COLORS.primary} />
+              </View>
+              <Text style={styles.serviceText}>Farmacia</Text>
+            </TouchableOpacity>
+
+            {/* Citas Médicas */}
+            <TouchableOpacity 
+              style={styles.serviceCard} 
+              onPress={() => navigation.navigate('Appointments')}
+            >
+              <View style={styles.iconContainer}>
+                <Icon name="calendar-month" type="material-community" size={24} color={THEME_COLORS.primary} />
+              </View>
+              <Text style={styles.serviceText}>Citas Presenciales</Text>
+            </TouchableOpacity>
+
+            {/* Telemedicina */}
+            <TouchableOpacity 
+              style={styles.serviceCard} 
+              onPress={() => navigation.navigate('TelemedicineHome')}
+            >
+              <View style={styles.iconContainer}>
+                <Icon name="phone-plus" type="material-community" size={24} color={THEME_COLORS.primary} />
+              </View>
+              <Text style={styles.serviceText}>Telemedicina</Text>
+            </TouchableOpacity>
+
+            {/* Servicios de Enfermería */}
+            <TouchableOpacity 
+              style={styles.serviceCard} 
+              onPress={() => navigation.navigate('NursingHome')}
+            >
+              <View style={styles.iconContainer}>
+                <Icon name="hospital-box" type="material-community" size={24} color={THEME_COLORS.primary} />
+              </View>
+              <Text style={styles.serviceText}>Servicios de Enfermería</Text>
+            </TouchableOpacity>
+
+            {/* Ambulancia */}
+            <TouchableOpacity 
+              style={styles.serviceCard} 
+              onPress={() => navigation.navigate('EmergencyMap')}
+            >
+              <View style={styles.iconContainer}>
+                <Icon name="ambulance" type="material-community" size={24} color={THEME_COLORS.primary} />
+              </View>
+              <Text style={styles.serviceText}>Ambulancia</Text>
+            </TouchableOpacity>
+
+            {/* Portal del Paciente */}
+            <TouchableOpacity 
+              style={styles.serviceCard} 
+              onPress={() => navigation.navigate('MedicalRecords')}
+            >
+              <View style={styles.iconContainer}>
+                <Icon name="account" type="material-community" size={24} color={THEME_COLORS.primary} />
+              </View>
+              <Text style={styles.serviceText}>Portal del Paciente</Text>
+            </TouchableOpacity>
           </View>
-          
-          {showResults && searchText ? (
-            <View style={styles.searchResults}>
-              {getFilteredModules().length > 0 ? (
-                getFilteredModules().map((module) => (
-                  <TouchableOpacity
-                    key={module.id}
-                    style={styles.searchResultItem}
-                    onPress={() => navigation.navigate(module.route)}
-                  >
-                    <Text style={styles.searchResultText}>{module.title}</Text>
-                    <Icon name="chevron-right" type="material-community" size={24} color={THEME_COLORS.gray} />
-                  </TouchableOpacity>
-                ))
-              ) : (
-                <Text style={styles.noResultsText}>No se encontraron resultados</Text>
-              )}
-            </View>
-          ) : (
-            <View style={styles.servicesGrid}>
-              {/* Farmacia */}
-              <TouchableOpacity 
-                style={styles.serviceCard} 
-                onPress={() => navigation.navigate('Pharmacy')}
-              >
-                <View style={styles.iconContainer}>
-                  <Icon name="medical-bag" type="material-community" size={24} color={THEME_COLORS.primary} />
-                </View>
-                <Text style={styles.serviceText}>Farmacia</Text>
-              </TouchableOpacity>
-
-              {/* Citas Médicas */}
-              <TouchableOpacity 
-                style={styles.serviceCard} 
-                onPress={() => navigation.navigate('Appointments')}
-              >
-                <View style={styles.iconContainer}>
-                  <Icon name="calendar-month" type="material-community" size={24} color={THEME_COLORS.primary} />
-                </View>
-                <Text style={styles.serviceText}>Citas Presenciales</Text>
-              </TouchableOpacity>
-
-              {/* Telemedicina */}
-              <TouchableOpacity 
-                style={styles.serviceCard} 
-                onPress={() => navigation.navigate('TelemedicineHome')}
-              >
-                <View style={styles.iconContainer}>
-                  <Icon name="phone-plus" type="material-community" size={24} color={THEME_COLORS.primary} />
-                </View>
-                <Text style={styles.serviceText}>Telemedicina</Text>
-              </TouchableOpacity>
-
-              {/* Servicios de Enfermería */}
-              <TouchableOpacity 
-                style={styles.serviceCard} 
-                onPress={() => navigation.navigate('NursingHome')}
-              >
-                <View style={styles.iconContainer}>
-                  <Icon name="hospital-box" type="material-community" size={24} color={THEME_COLORS.primary} />
-                </View>
-                <Text style={styles.serviceText}>Servicios de Enfermería</Text>
-              </TouchableOpacity>
-
-              {/* Ambulancia */}
-              <TouchableOpacity 
-                style={styles.serviceCard} 
-                onPress={() => navigation.navigate('EmergencyMap')}
-              >
-                <View style={styles.iconContainer}>
-                  <Icon name="ambulance" type="material-community" size={24} color={THEME_COLORS.primary} />
-                </View>
-                <Text style={styles.serviceText}>Ambulancia</Text>
-              </TouchableOpacity>
-
-              {/* Portal del Paciente */}
-              <TouchableOpacity 
-                style={styles.serviceCard} 
-                onPress={() => navigation.navigate('MedicalRecords')}
-              >
-                <View style={styles.iconContainer}>
-                  <Icon name="account" type="material-community" size={24} color={THEME_COLORS.primary} />
-                </View>
-                <Text style={styles.serviceText}>Portal del Paciente</Text>
-              </TouchableOpacity>
-            </View>
-          )}
         </View>
 
         {/* Barra de navegación inferior */}
@@ -564,53 +457,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     animation: 'pulse 2s infinite',
   },
-  searchContainer: {
-    marginBottom: 20,
-    zIndex: 1000,
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: 12,
-    fontSize: 15,
-    color: '#2A2A2A',
-    height: 40,
-    letterSpacing: 0.2,
-  },
-  searchResults: {
-    position: 'absolute',
-    top: '100%',
-    left: 0,
-    right: 0,
-    backgroundColor: 'white',
-    borderRadius: 15,
-    marginTop: 5,
-    shadowColor: THEME_COLORS.darkBlue,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 6,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.25)',
-    maxHeight: 200,
-  },
-  searchResultItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0, 0, 0, 0.05)',
-  },
-  searchResultText: {
-    fontSize: 15,
-    color: '#2A2A2A',
-    fontWeight: '500',
-  },
-  noResultsText: {
-    fontSize: 15,
-    color: '#666',
-    fontStyle: 'italic',
-  },
   servicesGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -623,9 +469,9 @@ const styles = StyleSheet.create({
     width: '31%',
     backgroundColor: '#fff',
     borderRadius: 20,
-    padding: 12,
+    padding: 15,
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 15,
     shadowColor: THEME_COLORS.darkBlue,
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.12,
@@ -633,16 +479,16 @@ const styles = StyleSheet.create({
     elevation: 7,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
-    aspectRatio: 0.85,
+    aspectRatio: 0.9,
   },
   iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: THEME_COLORS.lightestBlue,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
     shadowColor: THEME_COLORS.darkBlue,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.15,
@@ -652,11 +498,11 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   serviceText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
     color: '#2A2A2A',
     textAlign: 'center',
-    marginTop: 8,
+    marginTop: 10,
     lineHeight: 16,
     letterSpacing: 0.2,
   },

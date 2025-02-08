@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Card, Button } from '@rneui/themed';
+import { Card, Button, Avatar } from '@rneui/themed';
 import moment from 'moment';
 import 'moment/locale/es';
 
@@ -46,7 +46,26 @@ const NursingTrackingScreen = ({ route, navigation }) => {
       
       <Card containerStyle={styles.card}>
         <Card.Title>Enfermero/a Asignado/a</Card.Title>
-        <Text style={styles.nurseInfo}>Por asignar</Text>
+        {booking?.nurse ? (
+          <View style={styles.nurseContainer}>
+            <Avatar
+              size={60}
+              rounded
+              source={{ uri: booking.nurse.image }}
+              containerStyle={styles.nurseAvatar}
+            />
+            <View style={styles.nurseInfo}>
+              <Text style={styles.nurseName}>{booking.nurse.name}</Text>
+              <Text style={styles.nurseSpecialty}>{booking.nurse.specialty}</Text>
+              <View style={styles.ratingContainer}>
+                <Text style={styles.rating}>⭐ {booking.nurse.rating}</Text>
+                <Text style={styles.reviews}>({booking.nurse.reviews} reseñas)</Text>
+              </View>
+            </View>
+          </View>
+        ) : (
+          <Text style={styles.nurseInfo}>Por asignar</Text>
+        )}
       </Card>
 
       <Button
@@ -113,14 +132,44 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     marginTop: 4,
   },
-  nurseInfo: {
-    textAlign: 'center',
-    fontSize: 16,
-    color: '#718096',
+  nurseContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#E8F4F8',
     padding: 12,
     borderRadius: 12,
-    marginTop: 8,
+  },
+  nurseAvatar: {
+    marginRight: 16,
+    borderWidth: 2,
+    borderColor: '#4facfe',
+  },
+  nurseInfo: {
+    flex: 1,
+  },
+  nurseName: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#2d3748',
+    marginBottom: 4,
+  },
+  nurseSpecialty: {
+    fontSize: 14,
+    color: '#718096',
+    marginBottom: 4,
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  rating: {
+    fontSize: 14,
+    color: '#2d3748',
+    marginRight: 4,
+  },
+  reviews: {
+    fontSize: 14,
+    color: '#718096',
   },
   buttonContainer: {
     marginTop: 20,

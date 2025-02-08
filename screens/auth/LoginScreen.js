@@ -54,12 +54,14 @@ const LoginScreen = ({ navigation }) => {
           style={styles.content}
         >
           <View style={styles.header}>
-            <Image
-              source={require('../../assets/icon.png')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-            <Text style={styles.title}>MEDIGO</Text>
+            <View style={styles.logoContainer}>
+              <Icon
+                name="medical-services"
+                type="material"
+                size={80}
+                color="#718096"
+              />
+            </View>
             <Text style={styles.subtitle}>Tu salud en buenas manos</Text>
           </View>
 
@@ -172,21 +174,28 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     marginBottom: 40,
+    paddingTop: 20,
   },
-  logo: {
+  logoContainer: {
     width: 120,
     height: 120,
-    marginBottom: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+    backgroundColor: '#f8fafc',
+    borderRadius: 60,
+    borderWidth: 2,
+    borderColor: '#e2e8f0',
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#2d3748',
-    marginBottom: 8,
+  logo: {
+    width: '100%',
+    height: '100%',
+    tintColor: '#718096',
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#718096',
+    marginTop: 10,
   },
   form: {
     width: '100%',

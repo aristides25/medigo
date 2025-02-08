@@ -33,6 +33,11 @@ import MedicalRecordsScreen from '../screens/medical-records/MedicalRecordsScree
 import MedicalDocumentsScreen from '../screens/medical-records/MedicalDocumentsScreen';
 import DocumentDetailScreen from '../screens/medical-records/DocumentDetailScreen';
 import UploadDocumentScreen from '../screens/medical-records/UploadDocumentScreen';
+import ShareMedicalRecordScreen from '../screens/medical-records/ShareMedicalRecordScreen';
+import DigitalPrescriptionsScreen from '../screens/medical-records/DigitalPrescriptionsScreen';
+import AppointmentHistoryScreen from '../screens/medical-records/AppointmentHistoryScreen';
+import LabResultsScreen from '../screens/medical-records/LabResultsScreen';
+import PersonalMedicalDataScreen from '../screens/medical-records/PersonalMedicalDataScreen';
 // Emergency
 import EmergencyTypeScreen from '../screens/emergency/EmergencyTypeScreen';
 import EmergencyMapScreen from '../screens/emergency/EmergencyMapScreen';
@@ -43,6 +48,8 @@ import NursingHomeScreen from '../screens/nursing/NursingHomeScreen';
 import NursingServiceDetailScreen from '../screens/nursing/NursingServiceDetailScreen';
 import NursingBookingScreen from '../screens/nursing/NursingBookingScreen';
 import NursingTrackingScreen from '../screens/nursing/NursingTrackingScreen';
+import NurseSelectionScreen from '../screens/nursing/NurseSelectionScreen';
+import NurseProfileScreen from '../screens/nursing/NurseProfileScreen';
 // Telemedicine
 import SpecialtySelectionScreen from '../screens/telemedicine/consultation/SpecialtySelectionScreen';
 import DoctorSelectionScreen from '../screens/telemedicine/consultation/DoctorSelectionScreen';
@@ -53,8 +60,9 @@ import ConnectionTestScreen from '../screens/telemedicine/virtual-room/Connectio
 import WaitingRoomScreen from '../screens/telemedicine/virtual-room/WaitingRoomScreen';
 import ConsultationRoomScreen from '../screens/telemedicine/virtual-room/ConsultationRoomScreen';
 import PostConsultationScreen from '../screens/telemedicine/virtual-room/PostConsultationScreen';
-import ProfileScreen from '../screens/ProfileScreen';
+import ProfileScreen from '../screens/profile/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import EditProfileScreen from '../screens/profile/EditProfileScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -249,10 +257,61 @@ const AppNavigator = () => {
           }}
         />
         <Stack.Screen 
+          name="ShareMedicalRecord" 
+          component={ShareMedicalRecordScreen}
+          options={{
+            title: 'Compartir Expediente',
+          }}
+        />
+        <Stack.Screen 
           name="UploadDocument" 
           component={UploadDocumentScreen}
           options={{
             title: 'Subir Documento',
+          }}
+        />
+        <Stack.Screen 
+          name="DigitalPrescriptions"
+          component={DigitalPrescriptionsScreen}
+          options={{
+            title: 'Recetas Digitales',
+            headerStyle: {
+              backgroundColor: '#4facfe',
+            },
+            headerTintColor: '#fff',
+          }}
+        />
+        <Stack.Screen
+          name="AppointmentHistory"
+          component={AppointmentHistoryScreen}
+          options={{
+            title: 'Historial de Citas',
+            headerStyle: {
+              backgroundColor: '#4facfe',
+            },
+            headerTintColor: '#fff',
+          }}
+        />
+        <Stack.Screen
+          name="LabResults"
+          component={LabResultsScreen}
+          options={{
+            title: 'Resultados de Laboratorio',
+            headerStyle: {
+              backgroundColor: '#4facfe',
+            },
+            headerTintColor: '#fff',
+          }}
+        />
+        <Stack.Screen
+          name="PersonalMedicalData"
+          component={PersonalMedicalDataScreen}
+          options={{
+            title: 'Datos Médicos Personales',
+            headerStyle: {
+              backgroundColor: '#4facfe',
+            },
+            headerTintColor: '#fff',
           }}
         />
 
@@ -299,6 +358,20 @@ const AppNavigator = () => {
           component={NursingServiceDetailScreen}
           options={{
             title: 'Detalle del Servicio',
+          }}
+        />
+        <Stack.Screen 
+          name="NurseSelection" 
+          component={NurseSelectionScreen}
+          options={{
+            title: 'Seleccionar Enfermera',
+          }}
+        />
+        <Stack.Screen 
+          name="NurseProfile" 
+          component={NurseProfileScreen}
+          options={{
+            title: 'Perfil de Enfermera',
           }}
         />
         <Stack.Screen 
@@ -392,6 +465,13 @@ const AppNavigator = () => {
           component={ProfileScreen}
           options={{
             title: 'Mi Perfil',
+          }}
+        />
+        <Stack.Screen 
+          name="EditProfile" 
+          component={EditProfileScreen}
+          options={{
+            title: 'Editar Perfil',
           }}
         />
         <Stack.Screen 

@@ -1,11 +1,14 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { Text, Avatar } from '@rneui/themed';
+import { Text, Avatar, Icon as RNEIcon } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { COLORS, THEME } from '../../constants';
+import { useUser } from '../../context/UserContext';
 
-const ProfileScreen = () => {
+const ProfileScreen = ({ navigation }) => {
+  const { userInfo } = useUser();
+
   const renderInfoItem = (icon, label, value) => (
     <View style={styles.infoItem}>
       <View style={styles.iconContainer}>
@@ -18,6 +21,11 @@ const ProfileScreen = () => {
     </View>
   );
 
+  const handleEditProfile = () => {
+    console.log('Navegando a EditProfile');
+    navigation.navigate('EditProfile');
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
@@ -26,23 +34,30 @@ const ProfileScreen = () => {
             <Avatar
               size={100}
               rounded
-              icon={{ name: 'camera', type: 'material-community' }}
+              icon={{ 
+                name: 'account',
+                type: 'material-community',
+                color: COLORS.lightBlue
+              }}
               containerStyle={styles.avatar}
             />
-            <Text style={styles.name}>José Daniel</Text>
-            <Text style={styles.email}>jose.daniel@email.com</Text>
-            <TouchableOpacity style={styles.editButton}>
-              <Text style={styles.editButtonText}>Editar Perfil</Text>
+            <Text style={styles.name}>{userInfo?.name || 'Usuario'}</Text>
+            <Text style={styles.email}>{userInfo?.email || 'usuario@email.com'}</Text>
+            <TouchableOpacity style={styles.editButton} onPress={handleEditProfile}>
+              <View style={styles.editButtonContent}>
+                <Icon name="account-edit" size={20} color={COLORS.white} />
+                <Text style={styles.editButtonText}>Editar Perfil</Text>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
 
         <View style={styles.infoSection}>
           <Text style={styles.sectionTitle}>Información Personal</Text>
-          {renderInfoItem('phone', 'Teléfono', '+507 6123-4567')}
-          {renderInfoItem('water', 'Tipo de Sangre', 'O+')}
-          {renderInfoItem('weight', 'Peso', '75 kg')}
-          {renderInfoItem('human-male-height', 'Altura', '175 cm')}
+          {renderInfoItem('phone', 'Teléfono', userInfo?.phone || '+507 6123-4567')}
+          {renderInfoItem('water', 'Tipo de Sangre', userInfo?.bloodType || 'O+')}
+          {renderInfoItem('weight', 'Peso', userInfo?.weight || '75 kg')}
+          {renderInfoItem('human-male-height', 'Altura', userInfo?.height || '175 cm')}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -93,10 +108,16 @@ const styles = StyleSheet.create({
     marginTop: 20,
     ...THEME.shadow.light,
   },
+  editButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   editButtonText: {
     color: COLORS.white,
     fontSize: 16,
     fontWeight: '600',
+    marginLeft: 8,
   },
   infoSection: {
     backgroundColor: COLORS.white,

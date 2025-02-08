@@ -5,10 +5,10 @@ import { Text, Card, Button, Icon } from '@rneui/themed';
 const nursingServices = [
   {
     id: 1,
-    title: 'Cuidados Básicos',
-    description: 'Asistencia en actividades diarias, control de signos vitales y administración de medicamentos.',
-    icon: 'heart-pulse',
-    price: '25.00'
+    title: 'Cuidados en el Hogar',
+    description: 'Atención personalizada y cuidados especializados en la comodidad de tu hogar.',
+    icon: 'home-heart',
+    price: '35.00'
   },
   {
     id: 2,
@@ -23,13 +23,6 @@ const nursingServices = [
     description: 'Limpieza y curación de heridas, cambio de vendajes.',
     icon: 'bandage',
     price: '30.00'
-  },
-  {
-    id: 4,
-    title: 'Fisioterapia',
-    description: 'Ejercicios terapéuticos y rehabilitación física.',
-    icon: 'run',
-    price: '40.00'
   }
 ];
 

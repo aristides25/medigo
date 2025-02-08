@@ -8,6 +8,7 @@ import { MedicalRecordProvider } from './context/MedicalRecordContext';
 import { AppointmentProvider } from './context/AppointmentContext';
 import { RatingProvider } from './context/RatingContext';
 import { TelemedicineProvider } from './context/TelemedicineContext';
+import { UserProvider } from './context/UserContext';
 import AppNavigator from './navigation/AppNavigator';
 import 'react-native-gesture-handler';
 
@@ -29,19 +30,21 @@ const theme = createTheme({
 const AppProviders = memo(({ children }) => (
   <SafeAreaProvider>
     <ThemeProvider theme={theme}>
-      <TelemedicineProvider>
-        <CartProvider>
-          <PharmacyProvider>
-            <MedicalRecordProvider>
-              <AppointmentProvider>
-                <RatingProvider>
-                  {children}
-                </RatingProvider>
-              </AppointmentProvider>
-            </MedicalRecordProvider>
-          </PharmacyProvider>
-        </CartProvider>
-      </TelemedicineProvider>
+      <UserProvider>
+        <TelemedicineProvider>
+          <CartProvider>
+            <PharmacyProvider>
+              <MedicalRecordProvider>
+                <AppointmentProvider>
+                  <RatingProvider>
+                    {children}
+                  </RatingProvider>
+                </AppointmentProvider>
+              </MedicalRecordProvider>
+            </PharmacyProvider>
+          </CartProvider>
+        </TelemedicineProvider>
+      </UserProvider>
     </ThemeProvider>
   </SafeAreaProvider>
 ));
